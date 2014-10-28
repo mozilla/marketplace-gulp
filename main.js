@@ -46,7 +46,7 @@ gulp.task('install', function(done) {
 
 gulp.task('bower_copy', ['install'], function() {
     // Copy files from Bower into project.
-    return _.each(Object.keys(config.bowerConfig), function(source) {
+    return Object.keys(config.bowerConfig).forEach(function(source) {
         var dest = config.bowerConfig[source];
         gulp.src(paths.bower + source)
             .pipe(gulp.dest(dest));
