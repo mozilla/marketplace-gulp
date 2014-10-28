@@ -22,7 +22,7 @@ var requireDir = require('require-dir');
 var _ = require('underscore');
 var argv = require('yargs').argv;
 
-var config = require('../../../../config');
+var config = require('../../config');
 var nunjucksBuild = require('./plugins/nunjucks-build');
 var imgurlsAbsolutify = require('./plugins/imgurls-absolutify');
 var imgurlsCachebust = require('./plugins/imgurls-cachebust');

@@ -5,7 +5,7 @@
 var path = require('path');
 var through = require('through2');
 
-var config = require('../../../../../config');
+var config = require('../../../config');
 
 var url_pattern = /url\(([^)]+\?\d+)\)/g;  // Cachebusted imgurl.
 var img_urls = [];  // Keep track of duplicates.

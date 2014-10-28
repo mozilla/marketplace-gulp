@@ -5,7 +5,7 @@
 var through = require('through2');
 var path = require('path');
 
-var config = require('../../../../../config');
+var config = require('../../../config');
 
 var url_pattern = /url\(([^)]+)\)/g;
 
