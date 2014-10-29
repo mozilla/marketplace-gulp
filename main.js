@@ -203,7 +203,6 @@ gulp.task('serve', ['css_compile', 'templates_build'], function() {
     return gulp.src(['src'])
         .pipe(webserver({
             fallback: argv.template || 'index' + '.html',
-            livereload: true,
             port: argv.port || process.env.PORT || config.PORT || 8675
         }));
 });
