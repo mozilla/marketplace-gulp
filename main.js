@@ -19,7 +19,6 @@ var webserver = require('gulp-webserver');
 var mergeStream = require('merge-stream');
 var path = require('path');
 var requireDir = require('require-dir');
-var _ = require('underscore');
 var argv = require('yargs').argv;
 
 var config = require('../../config');
