@@ -204,7 +204,7 @@ gulp.task('serve', ['css_compile', 'templates_build'], function() {
         .pipe(webserver({
             fallback: argv.template || 'index' + '.html',
             livereload: true,
-            port: argv.port || config.PORT || 8675
+            port: argv.port || process.env.PORT || config.PORT || 8675
         }));
 });
 
