@@ -32,13 +32,6 @@ var paths = require('./paths');
 requireDir('tasks');
 
 
-var serveTasks = ['templates_build'];
-var compiled_css = glob.sync('src/media/css/*.styl.css').length;
-if (!compiled_css) {
-    serveTasks.push('css_compile');
-}
-
-
 gulp.task('install', function(done) {
     // Bumps bower and npm dependencies.
     gulp.src(['bower.json', 'package.json'])
@@ -204,7 +197,7 @@ gulp.task('js_build', ['templates_build'], function() {
 });
 
 
-gulp.task('serve', serveTasks, function() {
+gulp.task('serve', ['css_compile', 'templates_build'], function() {
     // template -- template to serve (e.g., index (default), app, server).
     // port -- server port, defaults to config port or 8675.
     return gulp.src(['src'])
