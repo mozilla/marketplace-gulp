@@ -1,26 +1,26 @@
-var amdOptimize = require('amd-optimize');
 var fs = require('fs');
-var glob = require('glob');
-var gulp = require('gulp');
+var path = require('path');
+
+var amdOptimize = require('amd-optimize');
+var argv = require('yargs').argv;
 var clean = require('gulp-clean');
 var concat = require('gulp-concat');
 var eventStream = require('event-stream');
+var gulp = require('gulp');
 var gulpFile = require('gulp-file');
-var ignore = require('gulp-ignore');
-var insert = require("gulp-insert");
-var install = require("gulp-install");
-var order = require('gulp-order');
+var gulpUtil = require('gulp-util');
+var ignore = require('gulp-ignore');  // temporarily unused
+var insert = require('gulp-insert');
+var install = require('gulp-install');
+var mergeStream = require('merge-stream');
 var minifyCSS = require('gulp-minify-css');
+var order = require('gulp-order');
 var rename = require('gulp-rename');
+var requireDir = require('require-dir');
 var stylus = require('gulp-stylus');
 var uglify = require('gulp-uglify');
-var gulpUtil = require('gulp-util');
 var watch = require('gulp-watch');
 var webserver = require('gulp-webserver');
-var mergeStream = require('merge-stream');
-var path = require('path');
-var requireDir = require('require-dir');
-var argv = require('yargs').argv;
 
 var config = require('../../config');
 var nunjucksBuild = require('./plugins/nunjucks-build');
@@ -276,7 +276,7 @@ gulp.task('watch', function() {
 
     // Recompile all Stylus files if a lib file was modified.
     gulp.src(paths.styl_lib)
-        .pipe(watch(paths.styl_lib, function(files) {
+        .pipe(watch(paths.styl_lib, function() {
             return css_compile_pipe(gulp.src(paths.styl));
         }));
 });
