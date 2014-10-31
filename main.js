@@ -141,7 +141,7 @@ gulp.task('css_bundles', ['css_compile_sync'], function() {
     });
 
     // Yes, cross the streams.
-    if (streams) {
+    if (streams.length) {
         return mergeStream.apply(this, streams);
     }
 });
