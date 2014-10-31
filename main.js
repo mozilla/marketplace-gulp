@@ -215,6 +215,7 @@ gulp.task('js_build', ['templates_build_sync'], function() {
         gulp.src(paths.js)
             .pipe(amdOptimize('main', {
                 baseUrl: config.JS_DEST_PATH,
+                exclude: ['l10n', 'views/tests'],
                 findNestedDependencies: true,
                 paths: config.requireConfig.paths,
                 shim: config.requireConfig.shim,
