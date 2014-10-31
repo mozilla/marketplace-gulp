@@ -98,6 +98,7 @@ gulp.task('templates_build_sync', function() {
 function css_compile_pipe(stream) {
     // Compile .styl files into .styl.css files.
     // Takes about 2s to compile all CSS files.
+    var startTime = new Date().getTime();
     return stream
         .pipe(stylus())
         .on('error', function(err) {
@@ -107,7 +108,16 @@ function css_compile_pipe(stream) {
         .pipe(rename(function(path) {
             path.extname = '.styl.css';
         }))
-        .pipe(gulp.dest(config.CSS_DEST_PATH));
+        .pipe(gulp.dest(config.CSS_DEST_PATH))
+        .pipe(eventStream.map(function(file) {
+            // TODO: Figure out where the logging and `startTime` should go.
+            // `stream.on('end')` is wrong because the stream gets chunked.
+            gulpUtil.log(gulpUtil.colors.magenta(path.basename(file.path)),
+                'was compiled in',
+                gulpUtil.colors.magenta(
+                    new Date().getTime() - startTime + ' ms'));
+            startTime = new Date().getTime();
+        }));
 }
 
 
