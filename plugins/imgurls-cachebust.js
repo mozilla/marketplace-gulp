@@ -11,7 +11,7 @@ function transform(file) {
     // Parses CSS file and appends cachebust timestamp to img URLs.
     var data = file.contents.toString('utf-8');
 
-    return data.replace(url_pattern, function(match, url, offset, string) {
+    return data.replace(url_pattern, function(match, url) {
         url = url.replace(/"|'/g, '');
 
         if (url.substring(0, 5) === 'data:') {
