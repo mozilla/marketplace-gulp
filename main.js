@@ -253,6 +253,7 @@ gulp.task('clean', function() {
         config.JS_DEST_PATH + paths.include_js,
         paths.styl_compiled,
         '_tmp',
+        'package/archives/*.zip',
         'src/locales',
         'src/media/locales',
         'src/media/build_id.txt',
