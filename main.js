@@ -15,6 +15,7 @@ var rename = require('gulp-rename');
 var stylus = require('gulp-stylus');
 var uglify = require('gulp-uglify');
 var gulpUtil = require('gulp-util');
+var watch = require('gulp-watch');
 var webserver = require('gulp-webserver');
 var mergeStream = require('merge-stream');
 var path = require('path');
@@ -94,15 +95,22 @@ gulp.task('templates_build_sync', function() {
 });
 
 
-function css_compile() {
+function css_compile_pipe(stream) {
     // Compile .styl files into .styl.css files.
     // Takes about 2s to compile all CSS files.
-    return gulp.src(paths.styl)
+    return stream
         .pipe(stylus())
         .pipe(rename(function(path) {
             path.extname = '.styl.css';
         }))
         .pipe(gulp.dest(config.CSS_DEST_PATH));
+}
+
+
+function css_compile() {
+    // Uses a helper function because it is also used by gulp-watch for
+    // file-by-file CSS compiling.
+    return css_compile_pipe(gulp.src(paths.styl));
 }
 
 
@@ -254,7 +262,12 @@ gulp.task('watch', function() {
     // Watch and recompile on change.
     // Note: does not detect new and deleted files while running.
     gulp.watch(paths.html, ['templates_build']);
-    gulp.watch(paths.styl, ['css_compile']);
+
+    // CSS compilation uses gulp-watch to only compile modified files.
+    gulp.src(paths.styl)
+        .pipe(watch(paths.styl, function(files) {
+            return css_compile_pipe(files);
+        }));
 });
 
 
