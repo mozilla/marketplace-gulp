@@ -274,6 +274,12 @@ gulp.task('watch', function() {
         .pipe(watch(paths.styl, function(files) {
             return css_compile_pipe(files);
         }));
+
+    // Recompile all Stylus files if a lib file was modified.
+    gulp.src(paths.styl_lib)
+        .pipe(watch(paths.styl_lib, function(files) {
+            return css_compile_pipe(gulp.src(paths.styl));
+        }));
 });
 
 
