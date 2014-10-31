@@ -45,7 +45,7 @@ gulp.task('install', function(done) {
 
 gulp.task('bower_copy', ['install'], function() {
     // Copy files from Bower into project.
-    return Object.keys(config.bowerConfig).forEach(function(source) {
+    Object.keys(config.bowerConfig).forEach(function(source) {
         var dest = config.bowerConfig[source];
         gulp.src(paths.bower + source)
             .pipe(gulp.dest(dest));
@@ -56,14 +56,15 @@ gulp.task('bower_copy', ['install'], function() {
 gulp.task('require_config', ['install'], function() {
     // Build a require.js file that contains a convenience call to
     // require.config that sets up some pre-known paths.
-    return gulp.src(paths.require)
+    gulp.src(paths.require)
         .pipe(insert.append(config.inlineRequireConfig))
         .pipe(gulp.dest(config.LIB_DEST_PATH));
 });
 
 
-gulp.task('templates_build', function() {
+function templates_build() {
     // Build Nunjucks templates into a templates.js file.
+    // Takes about 200ms to compile all templates.
     return gulp.src(paths.html)
         .pipe(nunjucksBuild())
         .pipe(concat('templates.js'))
@@ -80,21 +81,42 @@ gulp.task('templates_build', function() {
             '})();'
         ))
         .pipe(gulp.dest('src'));
+}
+
+
+gulp.task('templates_build', function() {
+    templates_build();
 });
 
 
-gulp.task('css_compile', function() {
+gulp.task('templates_build_sync', function() {
+    return templates_build();
+});
+
+
+function css_compile() {
     // Compile .styl files into .styl.css files.
+    // Takes about 2s to compile all CSS files.
     return gulp.src(paths.styl)
         .pipe(stylus())
         .pipe(rename(function(path) {
             path.extname = '.styl.css';
         }))
         .pipe(gulp.dest(config.CSS_DEST_PATH));
+}
+
+
+gulp.task('css_compile', function() {
+    css_compile();
 });
 
 
-gulp.task('css_bundles', ['css_compile'], function() {
+gulp.task('css_compile_sync', function() {
+    return css_compile();
+});
+
+
+gulp.task('css_bundles', ['css_compile_sync'], function() {
     // Read the config and build specified CSS bundles (like for splash.css).
     var streams = [];
 
@@ -113,7 +135,7 @@ gulp.task('css_bundles', ['css_compile'], function() {
 });
 
 
-gulp.task('css_build', ['css_bundles', 'css_compile'], function() {
+gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function() {
     // Bundle and minify all the CSS into include.css.
     var excludes = Object.keys(config.cssBundles || []).map(function(bundle) {
         // Exclude generated bundles if any specified in the config.
@@ -150,10 +172,10 @@ gulp.task('css_build', ['css_bundles', 'css_compile'], function() {
 });
 
 
-gulp.task('imgurls_write', ['css_build'], function() {
+gulp.task('imgurls_write', ['css_build_sync'], function() {
     // imgurls.txt is a list of cachebusted img URLs that is used by Zamboni
     // to generate the appcache manifest.
-    return gulp.src(config.CSS_DEST_PATH + paths.include_css)
+    gulp.src(config.CSS_DEST_PATH + paths.include_css)
         .pipe(imgurlsAbsolutify())
         .pipe(imgurlsParse())
         .pipe(rename('imgurls.txt'))
@@ -164,17 +186,17 @@ gulp.task('imgurls_write', ['css_build'], function() {
 gulp.task('buildID_write', function() {
     // Writes build ID to src/media/build_id.txt.
     var buildID = new Date().getTime().toString();
-    return gulpFile('build_id.txt', buildID)
+    gulpFile('build_id.txt', buildID)
         .pipe(gulp.dest('src/media'));
 });
 
 
-gulp.task('js_build', ['templates_build'], function() {
+gulp.task('js_build', ['templates_build_sync'], function() {
     // Uses the AMD optimizer to bundle our JS modules.
     // Will read our RequireJS config to handle shims, paths, and name
     // anonymous modules.
     // Traces all modules and outputs them in the correct order.
-    return eventStream.merge(
+    eventStream.merge(
         // Almond loader.
         gulp.src(paths.almond),
         // JS bundle.
@@ -197,20 +219,22 @@ gulp.task('js_build', ['templates_build'], function() {
 });
 
 
-gulp.task('serve', ['css_compile', 'templates_build'], function() {
+gulp.task('webserver', ['templates_build'], function() {
     // template -- template to serve (e.g., index (default), app, server).
     // port -- server port, defaults to config port or 8675.
-    return gulp.src(['src'])
+    gulp.src(['src'])
         .pipe(webserver({
             fallback: argv.template || 'index' + '.html',
-            livereload: true,
             port: argv.port || process.env.PORT || config.PORT || 8675
         }));
 });
 
 
+gulp.task('serve', ['webserver', 'css_compile', 'templates_build']);
+
+
 gulp.task('clean', function() {
-    return gulp.src([
+    gulp.src([
         config.CSS_DEST_PATH + 'splash.css',
         config.CSS_DEST_PATH + paths.include_css,
         config.JS_DEST_PATH + paths.include_js,
@@ -236,8 +260,8 @@ gulp.task('watch', function() {
 
 gulp.task('default', ['watch', 'serve']);
 gulp.task('update', ['bower_copy', 'require_config']);
-gulp.task('build', ['buildID_write', 'css_build', 'js_build',
-                    'templates_build', 'imgurls_write']);
+gulp.task('build', ['buildID_write', 'css_build_sync', 'js_build',
+                    'templates_build_sync', 'imgurls_write']);
 
 
 module.exports = {
