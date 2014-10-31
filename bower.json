@@ -1,7 +1,7 @@
 {
   "author": "Mozilla",
   "name": "marketplace-gulp",
-  "version": "1.0.6",
+  "version": "1.0.61",
   "ignore": [
     "bower.json",
     "LICENSE",
