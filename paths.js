@@ -8,7 +8,7 @@ var paths = {
     html: 'src/templates/**/*.html',
     include_css: 'include.css',
     include_js: 'include.js',
-    js: config.JS_DEST_PATH + '**/*.js',
+    js: [config.JS_DEST_PATH + '**/*.js', 'src/templates.js'],
 };
 paths.require = paths.bower + 'requirejs/require.js';
 paths.almond = paths.bower + 'almond/almond.js';

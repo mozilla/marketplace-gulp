@@ -9,7 +9,6 @@ var eventStream = require('event-stream');
 var gulp = require('gulp');
 var gulpFile = require('gulp-file');
 var gulpUtil = require('gulp-util');
-var ignore = require('gulp-ignore');  // temporarily unused
 var insert = require('gulp-insert');
 var install = require('gulp-install');
 var mergeStream = require('merge-stream');
@@ -63,7 +62,7 @@ gulp.task('require_config', ['install'], function() {
 });
 
 
-function templates_build() {
+function templatesBuild() {
     // Build Nunjucks templates into a templates.js file.
     // Takes about 200ms to compile all templates.
     return gulp.src(paths.html)
@@ -86,16 +85,16 @@ function templates_build() {
 
 
 gulp.task('templates_build', function() {
-    templates_build();
+    templatesBuild();
 });
 
 
 gulp.task('templates_build_sync', function() {
-    return templates_build();
+    return templatesBuild();
 });
 
 
-function css_compile_pipe(stream) {
+function cssCompilePipe(stream) {
     // Compile .styl files into .styl.css files.
     // Takes about 2s to compile all CSS files.
     return stream
@@ -111,20 +110,20 @@ function css_compile_pipe(stream) {
 }
 
 
-function css_compile() {
+function cssCompile() {
     // Uses a helper function because it is also used by gulp-watch for
     // file-by-file CSS compiling.
-    return css_compile_pipe(gulp.src(paths.styl));
+    return cssCompilePipe(gulp.src(paths.styl));
 }
 
 
 gulp.task('css_compile', function() {
-    css_compile();
+    cssCompile();
 });
 
 
 gulp.task('css_compile_sync', function() {
-    return css_compile();
+    return cssCompile();
 });
 
 
@@ -203,22 +202,29 @@ gulp.task('buildID_write', function() {
 });
 
 
-gulp.task('js_build', ['templates_build_sync'], function() {
-    // Uses the AMD optimizer to bundle our JS modules.
-    // Will read our RequireJS config to handle shims, paths, and name
-    // anonymous modules.
-    // Traces all modules and outputs them in the correct order.
-    eventStream.merge(
+function jsBuild(jsSrcStream) {
+    /* Uses the AMD optimizer to bundle our JS modules.
+     * Will read our RequireJS config to handle shims, paths, and name
+     * anonymous modules.
+     * Traces all modules and outputs them in the correct order.
+     * Note: amd-optimize looks for files in input stream first, then baseUrl.
+     */
+    return eventStream.merge(
         // Almond loader.
         gulp.src(paths.almond),
         // JS bundle.
-        gulp.src(paths.js)
+        jsSrcStream
             .pipe(amdOptimize('main', {
-                baseUrl: config.JS_DEST_PATH,
                 findNestedDependencies: true,
                 paths: config.requireConfig.paths,
                 shim: config.requireConfig.shim,
-                wrapShim: true
+                wrapShim: true,
+                loader: amdOptimize.loader(function(moduleName) {
+                    // Fallback loader. Can't find templates for some reason.
+                    if (moduleName == '../../templates') {
+                        return 'src/templates.js';
+                    }
+                })
             }))
             .pipe(concat(paths.include_js)),
         // Init script.
@@ -226,7 +232,12 @@ gulp.task('js_build', ['templates_build_sync'], function() {
     )
         .pipe(order(['**/almond.js', '**/include.js', '**/init.js']))
         .pipe(uglify())
-        .pipe(concat(paths.include_js))
+        .pipe(concat(paths.include_js));
+}
+
+
+gulp.task('js_build', ['templates_build_sync'], function() {
+    jsBuild(gulp.src(paths.js))
         .pipe(gulp.dest(config.JS_DEST_PATH));
 });
 
@@ -240,9 +251,6 @@ gulp.task('webserver', ['templates_build'], function() {
             port: argv.port || process.env.PORT || config.PORT || 8675
         }));
 });
-
-
-gulp.task('serve', ['webserver', 'css_compile', 'templates_build']);
 
 
 gulp.task('clean', function() {
@@ -271,23 +279,28 @@ gulp.task('watch', function() {
     // CSS compilation uses gulp-watch to only compile modified files.
     gulp.src(paths.styl)
         .pipe(watch(paths.styl, function(files) {
-            return css_compile_pipe(files);
+            return cssCompilePipe(files);
         }));
 
     // Recompile all Stylus files if a lib file was modified.
     gulp.src(paths.styl_lib)
         .pipe(watch(paths.styl_lib, function() {
-            return css_compile_pipe(gulp.src(paths.styl));
+            return cssCompilePipe(gulp.src(paths.styl));
         }));
 });
 
 
+gulp.task('serve', ['webserver', 'css_compile', 'templates_build']);
+
 gulp.task('default', ['watch', 'serve']);
+
 gulp.task('update', ['bower_copy', 'require_config']);
+
 gulp.task('build', ['buildID_write', 'css_build_sync', 'js_build',
                     'templates_build_sync', 'imgurls_write']);
 
 
 module.exports = {
+    jsBuild: jsBuild,
     paths: paths
 };
