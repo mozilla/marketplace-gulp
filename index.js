@@ -11,6 +11,7 @@ var gulpFile = require('gulp-file');
 var gulpUtil = require('gulp-util');
 var insert = require('gulp-insert');
 var install = require('gulp-install');
+var jshint = require('gulp-jshint');
 var mergeStream = require('merge-stream');
 var minifyCSS = require('gulp-minify-css');
 var order = require('gulp-order');
@@ -250,6 +251,22 @@ gulp.task('webserver', ['templates_build'], function() {
             fallback: argv.template || 'index' + '.html',
             port: argv.port || process.env.PORT || config.PORT || 8675
         }));
+});
+
+
+gulp.task('lint', function() {
+    // JSHint.
+    var js = paths.js;
+    js.splice(js.indexOf('src/templates.js'), 1);  // Skip templates.
+    js = js.concat([
+        // Skip non-Commonplace lib files.
+        '!' + config.JS_DEST_PATH + 'lib/*.js',
+        // Skip include.js.
+        '!' + config.JS_DEST_PATH + paths.include_js
+    ]);
+    gulp.src(js)
+        .pipe(jshint())
+        .pipe(jshint.reporter('jshint-stylish'));
 });
 
 

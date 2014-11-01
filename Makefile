@@ -19,5 +19,8 @@ css:
 templates:
 	@node_modules/.bin/gulp templates_build
 
+lint:
+	@node_modules/.bin/gulp lint
+
 clean:
 	@node_modules/.bin/gulp clean
