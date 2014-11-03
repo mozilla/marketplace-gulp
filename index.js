@@ -17,12 +17,14 @@ var minifyCSS = require('gulp-minify-css');
 var order = require('gulp-order');
 var rename = require('gulp-rename');
 var requireDir = require('require-dir');
+var sourcemaps = require('gulp-sourcemaps');
 var stylus = require('gulp-stylus');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
 var webserver = require('gulp-webserver');
 
 var config = require('../../config');
+var mapcat = require('./plugins/gulp-mapcat');
 var nunjucksBuild = require('./plugins/nunjucks-build');
 var imgurlsAbsolutify = require('./plugins/imgurls-absolutify');
 var imgurlsCachebust = require('./plugins/imgurls-cachebust');
@@ -176,10 +178,12 @@ gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function() {
     return gulp.src(css_src.concat(excludes))
         .pipe(stylus({compress: true}))
         .pipe(imgurlsCachebust())
-        .pipe(minifyCSS())
         .pipe(order(css_files,
                     {base: config.CSS_DEST_PATH}))
-        .pipe(concat(paths.include_css))
+        .pipe(sourcemaps.init())
+            .pipe(minifyCSS())
+            .pipe(concat(paths.include_css))
+        .pipe(sourcemaps.write('maps'))
         .pipe(gulp.dest(config.CSS_DEST_PATH));
 });
 
@@ -237,10 +241,20 @@ function jsBuild(jsSrcStream) {
 }
 
 
-gulp.task('js_build', ['templates_build_sync'], function() {
-    jsBuild(gulp.src(paths.js))
+gulp.task('js_bundle_sync', ['templates_build_sync'], function() {
+    return jsBuild(gulp.src(paths.js))
         .pipe(gulp.dest(config.JS_DEST_PATH));
 });
+
+
+gulp.task('js_sourcemaps', ['js_bundle_sync'], function() {
+    gulp.src('src/media/js/maps/*')
+        .pipe(mapcat('src/media/js/maps/map.js',
+                     config.JS_DEST_PATH + paths.include_js));
+});
+
+
+gulp.task('js_build', ['js_bundle', 'js_sourcemaps']);
 
 
 gulp.task('webserver', ['templates_build'], function() {
