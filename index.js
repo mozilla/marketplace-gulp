@@ -12,11 +12,15 @@ var gulpUtil = require('gulp-util');
 var insert = require('gulp-insert');
 var install = require('gulp-install');
 var jshint = require('gulp-jshint');
+var mapcat = require('mapcat').cat;
 var mergeStream = require('merge-stream');
 var minifyCSS = require('gulp-minify-css');
 var order = require('gulp-order');
 var rename = require('gulp-rename');
+var replace = require('gulp-replace');
 var requireDir = require('require-dir');
+var runSequence = require('run-sequence');
+var sourcemaps = require('gulp-sourcemaps');
 var stylus = require('gulp-stylus');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
@@ -147,7 +151,7 @@ gulp.task('css_bundles', ['css_compile_sync'], function() {
 });
 
 
-gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function(done) {
+gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function() {
     // Bundle and minify all the CSS into include.css.
     var excludes = Object.keys(config.cssBundles || []).map(function(bundle) {
         // Exclude generated bundles if any specified in the config.
@@ -173,17 +177,15 @@ gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function(done) 
         return config.CSS_DEST_PATH + css;
     });
 
-    if (!css_src.length) {
-        return done();
-    }
-
     return gulp.src(css_src.concat(excludes))
         .pipe(stylus({compress: true}))
         .pipe(imgurlsCachebust())
-        .pipe(minifyCSS())
         .pipe(order(css_files,
                     {base: config.CSS_DEST_PATH}))
-        .pipe(concat(paths.include_css))
+        .pipe(sourcemaps.init())
+            .pipe(minifyCSS())
+            .pipe(concat(paths.include_css))
+        .pipe(sourcemaps.write('maps'))
         .pipe(gulp.dest(config.CSS_DEST_PATH));
 });
 
@@ -214,9 +216,15 @@ function jsBuild(jsSrcStream) {
      * Traces all modules and outputs them in the correct order.
      * Note: amd-optimize looks for files in input stream first, then baseUrl.
      */
+    console.log(paths.almond);
+    console.log(paths.init);
     return eventStream.merge(
         // Almond loader.
-        gulp.src(paths.almond),
+        gulp.src([paths.almond, paths.init])
+            .pipe(sourcemaps.init())
+                .pipe(concat('loader.js'))
+                .pipe(uglify())
+            .pipe(sourcemaps.write('./')),
         // JS bundle.
         jsSrcStream
             .pipe(amdOptimize('main', {
@@ -231,19 +239,52 @@ function jsBuild(jsSrcStream) {
                     }
                 })
             }))
-            .pipe(concat(paths.include_js)),
-        // Init script.
-        gulp.src(paths.init)
-    )
-        .pipe(order(['**/almond.js', '**/include.js', '**/init.js']))
-        .pipe(uglify())
-        .pipe(concat(paths.include_js));
+            .pipe(sourcemaps.init())
+                .pipe(concat(paths.include_js))
+                .pipe(uglify())
+            .pipe(sourcemaps.write('./'))
+    );
 }
 
 
-gulp.task('js_build', ['templates_build_sync'], function() {
-    jsBuild(gulp.src(paths.js))
+gulp.task('js_bundle_sync', ['templates_build_sync'], function() {
+    return jsBuild(gulp.src(paths.js))
         .pipe(gulp.dest(config.JS_DEST_PATH));
+});
+
+
+gulp.task('js_sourcemaps_concat', function() {
+    mapcat(['src/media/js/loader.js.map',
+            'src/media/js/include.js.map'],
+           'src/media/js/include.js',
+           'src/media/js/maps/include.js.map');
+});
+
+
+gulp.task('js_sourcemaps_patch_sources', function() {
+    gulp.src('src/media/js/maps/include.js.map')
+        // .pipe(replace(/\.\.\/source/g, '..'))
+        .pipe(replace(/almond.js/, 'lib/almond.js'))
+        .pipe(replace(/init.js/, 'lib/commonplace/init.js'))
+        .pipe(gulp.dest('src/media/js/maps'));
+});
+
+
+gulp.task('js_sourcemaps_patch_url', function() {
+    gulp.src('src/media/js/include.js')
+        .pipe(replace(/sourceMappingURL=undefined/, 'sourceMappingURL='))
+        .pipe(gulp.dest('src/media/js'));
+});
+
+
+gulp.task('js_sourcemaps', function() {
+    runSequence('js_sourcemaps_concat', 'js_sourcemaps_patch_sources',
+                'js_sourcemaps_patch_url');
+});
+
+
+gulp.task('js_build', function() {
+    runSequence('js_bundle_sync', 'js_sourcemaps');
 });
 
 
