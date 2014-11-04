@@ -1,4 +1,4 @@
-var config = require('../../config');
+var config = require(process.env.GULP_CONFIG_PATH || '../../config');
 
 var paths = {
     bower: process.env.BOWER_PATH || 'bower_components/',
