@@ -1,7 +1,7 @@
 var config = require('../../config');
 
 var paths = {
-    bower: 'bower_components/',
+    bower: process.env.BOWER_PATH || 'bower_components/',
     css: config.CSS_DEST_PATH + '**/*.css',
     styl_compiled: config.CSS_DEST_PATH + '**/*.styl.css',
     styl_lib: config.CSS_DEST_PATH + 'lib.styl',
