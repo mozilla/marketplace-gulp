@@ -147,7 +147,7 @@ gulp.task('css_bundles', ['css_compile_sync'], function() {
 });
 
 
-gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function() {
+gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function(done) {
     // Bundle and minify all the CSS into include.css.
     var excludes = Object.keys(config.cssBundles || []).map(function(bundle) {
         // Exclude generated bundles if any specified in the config.
@@ -172,6 +172,10 @@ gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function() {
     css_src = css_files.map(function(css) {
         return config.CSS_DEST_PATH + css;
     });
+
+    if (!css_src.length) {
+        return done();
+    }
 
     return gulp.src(css_src.concat(excludes))
         .pipe(stylus({compress: true}))
