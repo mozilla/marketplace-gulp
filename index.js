@@ -22,7 +22,7 @@ var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
 var webserver = require('gulp-webserver');
 
-var config = require('../../config');
+var config = require(process.env.GULP_CONFIG_PATH || '../../config');
 var nunjucksBuild = require('./plugins/nunjucks-build');
 var imgurlsAbsolutify = require('./plugins/imgurls-absolutify');
 var imgurlsCachebust = require('./plugins/imgurls-cachebust');
