@@ -1,11 +1,11 @@
 var fs = require('fs');
 var path = require('path');
 
-var amdOptimize = require('amd-optimize');
 var argv = require('yargs').argv;
 var clean = require('gulp-clean');
 var concat = require('gulp-concat');
 var eventStream = require('event-stream');
+var extend = require('node.extend');
 var gulp = require('gulp');
 var gulpFile = require('gulp-file');
 var gulpUtil = require('gulp-util');
@@ -16,6 +16,7 @@ var minifyCSS = require('gulp-minify-css');
 var order = require('gulp-order');
 var rename = require('gulp-rename');
 var requireDir = require('require-dir');
+var rjs = require('requirejs');
 var stylus = require('gulp-stylus');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
@@ -193,43 +194,32 @@ gulp.task('buildID_write', function() {
 });
 
 
-function jsBuild(jsSrcStream) {
-    /* Uses the AMD optimizer to bundle our JS modules.
+function jsBuild(overrideConfig, cb) {
+    /* r.js AMD optimizer.
      * Will read our RequireJS config to handle shims, paths, and name
      * anonymous modules.
      * Traces all modules and outputs them in the correct order.
-     * Note: amd-optimize looks for files in input stream first, then baseUrl.
+     * Opts: https://github.com/jrburke/r.js/blob/master/build/example.build.js
      */
-    return eventStream.merge(
-        // Almond loader.
-        gulp.src(paths.almond),
-        // JS bundle.
-        jsSrcStream
-            .pipe(amdOptimize('main', {
-                findNestedDependencies: true,
-                paths: config.requireConfig.paths,
-                shim: config.requireConfig.shim,
-                wrapShim: true,
-                loader: amdOptimize.loader(function(moduleName) {
-                    // Fallback loader. Can't find templates for some reason.
-                    if (moduleName == '../../templates') {
-                        return 'src/templates.js';
-                    }
-                })
-            }))
-            .pipe(concat(paths.include_js)),
-        // Init script.
-        gulp.src(paths.init)
-    )
-        .pipe(order(['**/almond.js', '**/include.js', '**/init.js']))
-        .pipe(uglify())
-        .pipe(concat(paths.include_js));
+    rjs.optimize(extend(true, {
+        baseUrl: config.JS_DEST_PATH,
+        findNestedDependencies: true,
+        generateSourceMaps: true,
+        include: ['lib/almond', 'main'],
+        insertRequire: ['main'],
+        paths: config.requireConfig.paths,
+        preserveLicenseComments: false,
+        optimize: 'uglify2',
+        out: config.JS_DEST_PATH + paths.include_js,
+        shim: config.requireConfig.shim,
+        stubModules: ['views/tests'],
+        wrapShim: true,
+    }, overrideConfig || {}), cb);
 }
 
 
 gulp.task('js_build', ['templates_build_sync'], function() {
-    jsBuild(gulp.src(paths.js))
-        .pipe(gulp.dest(config.JS_DEST_PATH));
+    jsBuild();
 });
 
 
