@@ -10,7 +10,6 @@ var gulp = require('gulp');
 var gulpFile = require('gulp-file');
 var gulpUtil = require('gulp-util');
 var insert = require('gulp-insert');
-var install = require('gulp-install');
 var jshint = require('gulp-jshint');
 var mergeStream = require('merge-stream');
 var minifyCSS = require('gulp-minify-css');
@@ -33,17 +32,6 @@ var paths = require('./paths');
 requireDir('tasks');
 
 
-gulp.task('install', function(done) {
-    // Bumps bower and npm dependencies.
-    gulp.src(['bower.json', 'package.json'])
-        .pipe(install())
-        .pipe(gulpUtil.noop())  // Wait for dependencies to finish installing.
-        .on('finish', function() {
-            done();
-        });
-});
-
-
 function bowerCopy() {
     // Copy files from Bower into project.
     // In a separate function because Fireplace-Docker doesn't want the install
@@ -56,7 +44,7 @@ function bowerCopy() {
 }
 
 
-gulp.task('bower_copy', ['install'], function() {
+gulp.task('bower_copy', function() {
     bowerCopy();
 });
 
@@ -72,7 +60,7 @@ function requireConfig() {
 }
 
 
-gulp.task('require_config', ['install'], function() {
+gulp.task('require_config', function() {
     requireConfig();
 });
 

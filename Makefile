@@ -8,6 +8,8 @@ serve:
 	@node_modules/.bin/gulp
 
 update:
+	@npm install
+	@node_modules/.bin/bower install
 	@node_modules/.bin/gulp update
 
 build:
