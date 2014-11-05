@@ -1,7 +1,7 @@
 var config = require(process.env.GULP_CONFIG_PATH || '../../config');
 
 var paths = {
-    bower: process.env.BOWER_PATH || 'bower_components/',
+    bower: config.BOWER_PATH,
     css: config.CSS_DEST_PATH + '**/*.css',
     styl_compiled: config.CSS_DEST_PATH + '**/*.styl.css',
     styl_lib: config.CSS_DEST_PATH + 'lib.styl',
