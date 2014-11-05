@@ -32,36 +32,20 @@ var paths = require('./paths');
 requireDir('tasks');
 
 
-function bowerCopy() {
+gulp.task('bower_copy', function() {
     // Copy files from Bower into project.
-    // In a separate function because Fireplace-Docker doesn't want the install
-    // dependency task.
     Object.keys(config.bowerConfig).forEach(function(source) {
         var dest = config.bowerConfig[source];
         gulp.src(paths.bower + source)
             .pipe(gulp.dest(dest));
     });
-}
-
-
-gulp.task('bower_copy', function() {
-    bowerCopy();
 });
 
 
-function requireConfig() {
-    // Build a require.js file that contains a convenience call to
-    // require.config that sets up some pre-known paths.
-    // In a separate function because Fireplace-Docker doesn't want the install
-    // dependency task.
+gulp.task('require_config', function() {
     gulp.src(paths.require)
         .pipe(insert.append(config.inlineRequireConfig))
         .pipe(gulp.dest(config.LIB_DEST_PATH));
-}
-
-
-gulp.task('require_config', function() {
-    requireConfig();
 });
 
 
@@ -324,8 +308,6 @@ gulp.task('build', ['buildID_write', 'css_build_sync', 'js_build',
 
 
 module.exports = {
-    bowerCopy: bowerCopy,
     jsBuild: jsBuild,
-    requireConfig: requireConfig,
     paths: paths
 };
