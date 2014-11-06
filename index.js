@@ -4,23 +4,26 @@ var path = require('path');
 var argv = require('yargs').argv;
 var clean = require('gulp-clean');
 var concat = require('gulp-concat');
+var connect = require('connect');
 var eventStream = require('event-stream');
 var extend = require('node.extend');
 var gulp = require('gulp');
 var gulpFile = require('gulp-file');
 var gulpUtil = require('gulp-util');
 var insert = require('gulp-insert');
+var liveReload = require('gulp-livereload');
 var jshint = require('gulp-jshint');
 var mergeStream = require('merge-stream');
 var minifyCSS = require('gulp-minify-css');
 var order = require('gulp-order');
-var rename = require('gulp-rename');
 var requireDir = require('require-dir');
+var rename = require('gulp-rename');
+var replace = require('gulp-replace');
 var rjs = require('requirejs');
+var serveStatic = require('serve-static');
 var stylus = require('gulp-stylus');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
-var webserver = require('gulp-webserver');
 
 var config = require(process.env.GULP_CONFIG_PATH || '../../config');
 var nunjucksBuild = require('./plugins/nunjucks-build');
@@ -31,6 +34,13 @@ var paths = require('./paths');
 
 
 requireDir('tasks');
+
+
+// Which template to serve.
+var template = (process.env.TEMPLATE || argv.template || 'index');
+if (template.indexOf('.html') === -1) {
+    template += '.html';
+}
 
 
 gulp.task('bower_copy', function() {
@@ -223,14 +233,25 @@ gulp.task('js_build', ['templates_build_sync'], function() {
 });
 
 
-gulp.task('webserver', ['templates_build'], function() {
+gulp.task('html_inject_livereload', function() {
+    // Inject livereload script into served template.
+    gulp.src('src/' + template)
+        .pipe(replace(/<\/body>/, '<script src="http://localhost:35729/livereload.js"></script>\n</body>'))
+        .pipe(rename('index.html'))
+        .pipe(gulp.dest('src/.tmp'));
+});
+
+
+gulp.task('webserver', ['html_inject_livereload', 'templates_build'], function() {
     // template -- template to serve (e.g., index (default), app, server).
     // port -- server port, defaults to config port or 8675.
-    gulp.src(['src'])
-        .pipe(webserver({
-            fallback: argv.template || 'index' + '.html',
-            port: argv.port || process.env.PORT || config.PORT || 8675
-        }));
+    var port = argv.port || process.env.PORT || config.PORT || 8675;
+    connect()
+        .use(serveStatic('src', {index: '.tmp/index.html'}))
+        .listen(port, function() {
+            gulpUtil.log('Webserver started at', gulpUtil.colors.cyan(
+                         'http://localhost:' + port));
+        });
 });
 
 
@@ -255,9 +276,11 @@ gulp.task('clean', function() {
         config.CSS_DEST_PATH + 'splash.css',
         config.CSS_DEST_PATH + paths.include_css,
         config.JS_DEST_PATH + paths.include_js,
+        config.JS_DEST_PATH + paths.include_js + '.map',
         paths.styl_compiled,
-        '_tmp',
+        '.tmp',
         'package/archives/*.zip',
+        'package/.tmp',
         'src/locales',
         'src/media/locales',
         'src/media/build_id.txt',
@@ -270,20 +293,23 @@ gulp.task('clean', function() {
 
 gulp.task('watch', function() {
     // Watch and recompile on change.
-    // Note: does not detect new and deleted files while running.
     gulp.watch(paths.html, ['templates_build']);
 
     // CSS compilation uses gulp-watch to only compile modified files.
     gulp.src(paths.styl)
         .pipe(watch(paths.styl, function(files) {
-            return cssCompilePipe(files);
+            return cssCompilePipe(files)
+                .pipe(liveReload({silent: true}));
         }));
 
     // Recompile all Stylus files if a lib file was modified.
     gulp.src(paths.styl_lib)
         .pipe(watch(paths.styl_lib, function() {
-            return cssCompilePipe(gulp.src(paths.styl));
+            return cssCompilePipe(gulp.src(paths.styl))
+                .pipe(liveReload({silent: true}));
         }));
+
+    gulp.watch(paths.index_html, ['html_inject_livereload']);
 });
 
 
