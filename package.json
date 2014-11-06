@@ -14,7 +14,6 @@
   "dependencies": {
     "commonplace": "0.6.45",
     "event-stream": "3.1.7",
-    "glob": "4.0.6",
     "gulp": "3.8.x",
     "gulp-clean": "0.3.1",
     "gulp-concat": "2.4.1",
