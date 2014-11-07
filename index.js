@@ -4,7 +4,6 @@ var path = require('path');
 var argv = require('yargs').argv;
 var clean = require('gulp-clean');
 var concat = require('gulp-concat');
-var connect = require('connect');
 var eventStream = require('event-stream');
 var extend = require('node.extend');
 var gulp = require('gulp');
@@ -25,6 +24,7 @@ var stylus = require('gulp-stylus');
 var through2 = require('through2');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
+var webserver = require('gulp-webserver');
 
 var config = require(process.env.GULP_CONFIG_PATH || '../../config');
 var nunjucksBuild = require('./plugins/nunjucks-build');
@@ -246,13 +246,13 @@ gulp.task('html_inject_livereload', function() {
 gulp.task('webserver', ['html_inject_livereload', 'templates_build'], function() {
     // template -- template to serve (e.g., index (default), app, server).
     // port -- server port, defaults to config port or 8675.
-    var port = argv.port || process.env.PORT || config.PORT || 8675;
-    connect()
-        .use(serveStatic('src', {index: '.tmp/index.html'}))
-        .listen(port, function() {
-            gulpUtil.log('Webserver started at', gulpUtil.colors.cyan(
-                         'http://localhost:' + port));
-        });
+    // .tmp contains our index.html with the injected livereload and selected
+    // template.
+    gulp.src(['src/.tmp', 'src'])
+        .pipe(webserver({
+            fallback: '.tmp/index.html',  // Always serve our index.html.
+            port: argv.port || process.env.PORT || config.PORT || 8675
+        }));
 });
 
 

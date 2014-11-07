@@ -1,7 +1,7 @@
 {
   "name": "marketplace-gulp",
   "description": "gulpfiles for Firefox Marketplace frontend projects",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "index",
   "repository": {
     "url": "git://github.com/mozilla/marketplace-gulp.git",
@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "commonplace": "0.6.45",
-    "connect": "3.3.2",
     "event-stream": "3.1.7",
     "gulp": "3.8.x",
     "gulp-clean": "0.3.1",
@@ -32,6 +31,7 @@
     "gulp-uglify": "1.0.1",
     "gulp-util": "3.0.x",
     "gulp-watch": "1.1.0",
+    "gulp-webserver": "0.8.3",
     "gulp-zip": "2.0.2",
     "jshint-stylish": "1.0.0",
     "merge-stream": "0.1.6",
