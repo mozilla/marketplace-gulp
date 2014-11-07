@@ -21,6 +21,7 @@ var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var rjs = require('requirejs');
 var stylus = require('gulp-stylus');
+var through2 = require('through2');
 var watch = require('gulp-watch');
 var webserver = require('gulp-webserver');
 
@@ -339,24 +340,49 @@ gulp.task('clean', function() {
 });
 
 
+var compiledCSS = [];
+function smartLiveReload(cssStream, liveReloadServer) {
+    // Keep track of already-compiled CSS files and only trigger liveReload
+    // if a CSS file has already been compiled so it doesn't fire on webserver
+    // startup.
+    return cssStream
+        .pipe(through2.obj(function(chunk, enc, cb) {
+            if (compiledCSS.indexOf(chunk.path) === -1) {
+                compiledCSS.push(chunk.path);
+            } else {
+                var cssPath = config.CSS_DEST_PATH +
+                              chunk.path.split(config.CSS_DEST_PATH)[1];
+                liveReload.changed(cssPath, liveReloadServer);
+            }
+            cb();
+        }));
+}
+
+
 gulp.task('watch', function() {
     // Watch and recompile on change.
+    var liveReloadServer = liveReload.listen(LIVERELOAD_PORT);
+
     gulp.watch(paths.html, ['templates_build']);
 
     // CSS compilation uses gulp-watch to only compile modified files.
+    var compiledCSS = [];
     gulp.src(paths.styl)
         .pipe(watch(paths.styl, function(files) {
-            return cssCompilePipe(files)
-                .pipe(gulpIf(!process.env.NO_LIVERELOAD,
-                             liveReload(LIVERELOAD_PORT, {silent: true})));
+            return smartLiveReload(cssCompilePipe(files), liveReloadServer);
         }));
 
     // Recompile all Stylus files if a lib file was modified.
+    var showLibMsg = false;
+    setTimeout(function() {
+        showLibMsg = true;
+    }, 2000);
     gulp.src(paths.styl_lib)
         .pipe(watch(paths.styl_lib, function(files) {
-            return cssCompilePipe(gulp.src(paths.styl))
-                .pipe(gulpIf(!process.env.NO_LIVERELOAD,
-                             liveReload(LIVERELOAD_PORT, {silent: true})));
+            if (showLibMsg) {
+                console.log('Lib file changed. Recompiling all CSS.');
+            }
+            return cssCompilePipe(gulp.src(paths.styl));
         }));
 
     gulp.watch(paths.index_html, ['index_html_build']);
