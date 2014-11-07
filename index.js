@@ -8,6 +8,7 @@ var eventStream = require('event-stream');
 var extend = require('node.extend');
 var gulp = require('gulp');
 var gulpFile = require('gulp-file');
+var gulpIf = require('gulp-if');
 var gulpUtil = require('gulp-util');
 var insert = require('gulp-insert');
 var liveReload = require('gulp-livereload');
@@ -297,14 +298,14 @@ gulp.task('watch', function() {
     gulp.src(paths.styl)
         .pipe(watch(paths.styl, function(files) {
             return cssCompilePipe(files)
-                .pipe(liveReload({silent: true}));
+                .pipe(gulpIf(!process.env.NO_LIVERELOAD, liveReload({silent: true})));
         }));
 
     // Recompile all Stylus files if a lib file was modified.
     gulp.src(paths.styl_lib)
         .pipe(watch(paths.styl_lib, function(files) {
             return cssCompilePipe(gulp.src(paths.styl))
-                .pipe(liveReload({silent: true}));
+                .pipe(gulpIf(!process.env.NO_LIVERELOAD, liveReload({silent: true})));
         }));
 
     gulp.watch(paths.index_html, ['index_html_build']);
