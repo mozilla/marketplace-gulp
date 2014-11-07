@@ -38,7 +38,7 @@ requireDir('tasks');
 
 
 // Which template to serve.
-var template = (process.env.TEMPLATE || argv.template || 'index');
+var template = (process.env.TEMPLATE || argv.template || 'dev');
 if (template.indexOf('.html') === -1) {
     template += '.html';
 }
@@ -161,7 +161,7 @@ gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function(done) 
 
     // Determine which CSS files and which order to concat through index.html.
     var css_files = [];
-    var data = fs.readFileSync(path.resolve('src', 'index.html'));
+    var data = fs.readFileSync(path.resolve('src', 'dev.html'));
     data = data.toString();
     var css_pattern = new RegExp('href="/media/css/(.+.css)"', 'g');
     while (match = css_pattern.exec(data)) {
@@ -239,18 +239,16 @@ gulp.task('html_inject_livereload', function() {
     gulp.src('src/' + template)
         .pipe(replace(/<\/body>/, '<script src="http://localhost:35729/livereload.js"></script>\n</body>'))
         .pipe(rename('index.html'))
-        .pipe(gulp.dest('src/.tmp'));
+        .pipe(gulp.dest('src'));
 });
 
 
 gulp.task('webserver', ['html_inject_livereload', 'templates_build'], function() {
     // template -- template to serve (e.g., index (default), app, server).
     // port -- server port, defaults to config port or 8675.
-    // .tmp contains our index.html with the injected livereload and selected
-    // template.
-    gulp.src(['src/.tmp', 'src'])
+    gulp.src(['src'])
         .pipe(webserver({
-            fallback: '.tmp/index.html',  // Always serve our index.html.
+            fallback: 'index.html',
             port: argv.port || process.env.PORT || config.PORT || 8675
         }));
 });
@@ -279,7 +277,6 @@ gulp.task('clean', function() {
         config.JS_DEST_PATH + paths.include_js,
         config.JS_DEST_PATH + paths.include_js + '.map',
         paths.styl_compiled,
-        '.tmp',
         'package/archives/*.zip',
         'package/.tmp',
         'src/locales',
