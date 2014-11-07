@@ -244,7 +244,7 @@ gulp.task('index_html_build', function() {
 });
 
 
-gulp.task('webserver', ['html_inject_livereload', 'templates_build'], function() {
+gulp.task('webserver', ['index_html_build', 'templates_build'], function() {
     // template -- template to serve (e.g., index (default), app, server).
     // port -- server port, defaults to config port or 8675.
     gulp.src(['src'])
