@@ -234,7 +234,8 @@ gulp.task('js_build', ['templates_build_sync'], function() {
 });
 
 
-gulp.task('html_inject_livereload', function() {
+gulp.task('index_html_build', function() {
+    // Copy desired template to index.html.
     // Inject livereload script into served template.
     gulp.src('src/' + template)
         .pipe(replace(/<\/body>/, '<script src="http://localhost:35729/livereload.js"></script>\n</body>'))
@@ -327,7 +328,7 @@ gulp.task('watch', function() {
             return smartLiveReload(cssCompilePipe(files), liveReloadServer);
         }));
 
-    gulp.watch(paths.index_html, ['html_inject_livereload']);
+    gulp.watch(paths.index_html, ['index_html_build']);
 });
 
 
@@ -335,7 +336,7 @@ gulp.task('serve', ['webserver', 'css_compile', 'templates_build']);
 
 gulp.task('default', ['watch', 'serve']);
 
-gulp.task('update', ['bower_copy', 'require_config']);
+gulp.task('update', ['bower_copy', 'index_html_build', 'require_config']);
 
 gulp.task('build', ['buildID_write', 'css_build_sync', 'js_build',
                     'templates_build_sync', 'imgurls_write']);
