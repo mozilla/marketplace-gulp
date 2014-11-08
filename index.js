@@ -18,7 +18,6 @@ var requireDir = require('require-dir');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var rjs = require('requirejs');
-var serveStatic = require('serve-static');
 var stylus = require('gulp-stylus');
 var watch = require('gulp-watch');
 var webserver = require('gulp-webserver');

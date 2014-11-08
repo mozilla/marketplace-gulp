@@ -20,7 +20,6 @@
     "gulp-concat-css": "1.0.0",
     "gulp-file": "0.1.0",
     "gulp-if": "1.2.5",
-    "gulp-ignore": "1.2.1",
     "gulp-insert": "0.4.0",
     "gulp-livereload": "2.1.1",
     "gulp-jshint": "1.8.6",
@@ -40,7 +39,6 @@
     "require-dir": "0.1.0",
     "requirejs": "2.1.15",
     "run-sequence": "1.0.1",
-    "serve-static": "1.7.1",
     "stylus": "0.32.x",
     "through2": "0.6.2"
   }
