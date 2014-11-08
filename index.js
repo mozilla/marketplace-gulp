@@ -1,7 +1,6 @@
 var fs = require('fs');
 var path = require('path');
 
-var argv = require('yargs').argv;
 var clean = require('gulp-clean');
 var concat = require('gulp-concat');
 var eventStream = require('event-stream');
@@ -38,7 +37,7 @@ requireDir('tasks');
 
 
 // Which template to serve.
-var template = (process.env.TEMPLATE || argv.template || 'dev');
+var template = (process.env.TEMPLATE || 'dev');
 if (template.indexOf('.html') === -1) {
     template += '.html';
 }
@@ -250,7 +249,7 @@ gulp.task('webserver', ['index_html_build', 'templates_build'], function() {
     gulp.src(['src'])
         .pipe(webserver({
             fallback: 'index.html',
-            port: argv.port || process.env.PORT || config.PORT || 8675
+            port: process.env.PORT || config.PORT || 8675
         }));
 });
 
