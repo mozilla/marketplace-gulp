@@ -9,7 +9,7 @@ var paths = {
     html: 'src/templates/**/*.html',
     include_css: 'include.css',
     include_js: 'include.js',
-    index_html: 'src/*.html',
+    index_html: ['src/*.html', '!src/index.html'],
     js: [config.JS_DEST_PATH + '**/*.js', 'src/templates.js'],
 };
 paths.require = paths.bower + 'requirejs/require.js';
