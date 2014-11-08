@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 
 var concat = require('gulp-concat');
+var del = require('del');
 var eventStream = require('event-stream');
 var extend = require('node.extend');
 var gulp = require('gulp');
@@ -129,7 +130,7 @@ gulp.task('css_bundles', ['css_compile_sync'], function() {
     Object.keys(config.cssBundles || []).forEach(function(bundle) {
         streams.push(gulp.src(config.CSS_DEST_PATH + config.cssBundles[bundle])
             .pipe(concat(bundle))
-            .pipe(minifyCSS())
+            .pipe(gulpIf(!process.env.NO_MINIFY, minifyCSS()))
             .pipe(gulp.dest(config.CSS_DEST_PATH))
         );
     });
@@ -174,7 +175,7 @@ gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function(done) 
     return gulp.src(css_src.concat(excludes))
         .pipe(stylus({compress: true}))
         .pipe(imgurlsCachebust())
-        .pipe(minifyCSS())
+        .pipe(gulpIf(!process.env.NO_MINIFY, minifyCSS()))
         .pipe(order(css_files,
                     {base: config.CSS_DEST_PATH}))
         .pipe(concat(paths.include_css))
@@ -208,6 +209,11 @@ function jsBuild(overrideConfig, cb) {
      * Traces all modules and outputs them in the correct order.
      * Opts: https://github.com/jrburke/r.js/blob/master/build/example.build.js
      */
+    overrideConfig = overrideConfig || {};
+    if (process.env.NO_MINIFY) {
+        overrideConfig.optimize = "none";
+    }
+
     rjs.optimize(extend(true, {
         baseUrl: config.JS_DEST_PATH,
         findNestedDependencies: true,
@@ -221,7 +227,7 @@ function jsBuild(overrideConfig, cb) {
         shim: config.requireConfig.shim,
         stubModules: ['views/tests'],
         wrapShim: true,
-    }, overrideConfig || {}), cb);
+    }, overrideConfig), cb);
 }
 
 
