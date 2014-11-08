@@ -1,7 +1,6 @@
 var fs = require('fs');
 var path = require('path');
 
-var clean = require('gulp-clean');
 var concat = require('gulp-concat');
 var eventStream = require('event-stream');
 var extend = require('node.extend');
@@ -271,7 +270,7 @@ gulp.task('lint', function() {
 
 
 gulp.task('clean', function() {
-    gulp.src([
+    del([
         config.CSS_DEST_PATH + 'splash.css',
         config.CSS_DEST_PATH + paths.include_css,
         config.JS_DEST_PATH + paths.include_js,
@@ -279,13 +278,13 @@ gulp.task('clean', function() {
         paths.styl_compiled,
         'package/archives/*.zip',
         'package/.tmp',
+        'src/index.html',
         'src/locales',
         'src/media/locales',
         'src/media/build_id.txt',
         'src/media/imgurls.txt',
         'src/templates.js'
-    ], {read: false})
-        .pipe(clean({force: true}));
+    ]);
 });
 
 
