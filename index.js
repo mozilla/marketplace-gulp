@@ -40,6 +40,9 @@ if (template.indexOf('.html') === -1) {
     template += '.html';
 }
 
+var PORT = process.env.PORT || config.PORT || 8675;
+var LIVERELOAD_PORT = process.env.LIVERELOAD_PORT || PORT + 1000;
+
 
 gulp.task('bower_copy', function() {
     // Copy files from Bower into project.
@@ -240,19 +243,19 @@ gulp.task('index_html_build', function() {
     // Copy desired template to index.html.
     // Inject livereload script into served template.
     gulp.src('src/' + template)
-        .pipe(replace(/<\/body>/, '<script src="http://localhost:35729/livereload.js"></script>\n</body>'))
+        .pipe(replace(/<\/body>/,
+              '<script src="http://localhost:' + LIVERELOAD_PORT +
+              '/livereload.js"></script>\n</body>'))
         .pipe(rename('index.html'))
         .pipe(gulp.dest('src'));
 });
 
 
 gulp.task('webserver', ['index_html_build', 'templates_build'], function() {
-    // template -- template to serve (e.g., index (default), app, server).
-    // port -- server port, defaults to config port or 8675.
     gulp.src(['src'])
         .pipe(webserver({
             fallback: 'index.html',
-            port: process.env.PORT || config.PORT || 8675
+            port: PORT
         }));
 });
 
@@ -300,14 +303,16 @@ gulp.task('watch', function() {
     gulp.src(paths.styl)
         .pipe(watch(paths.styl, function(files) {
             return cssCompilePipe(files)
-                .pipe(gulpIf(!process.env.NO_LIVERELOAD, liveReload({silent: true})));
+                .pipe(gulpIf(!process.env.NO_LIVERELOAD,
+                             liveReload(LIVERELOAD_PORT, {silent: true})));
         }));
 
     // Recompile all Stylus files if a lib file was modified.
     gulp.src(paths.styl_lib)
         .pipe(watch(paths.styl_lib, function(files) {
             return cssCompilePipe(gulp.src(paths.styl))
-                .pipe(gulpIf(!process.env.NO_LIVERELOAD, liveReload({silent: true})));
+                .pipe(gulpIf(!process.env.NO_LIVERELOAD,
+                             liveReload({LIVERELOAD_PORT, silent: true})));
         }));
 
     gulp.watch(paths.index_html, ['index_html_build']);
