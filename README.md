@@ -1,7 +1,7 @@
-marketplace-gulp
-================
-
 gulpfiles for Firefox Marketplace frontend projects.
+
+- [Marketplace frontend documentation](https://marketplace-frontend.readthedocs.org)
+- [Marketplace documentation](https://marketplace.readthedocs.org)
 
 These gulpfiles includes tasks for JS, CSS, and template builds.
 
