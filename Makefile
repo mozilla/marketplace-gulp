@@ -7,11 +7,13 @@ gulp:
 serve:
 	@node_modules/.bin/gulp
 
-update:
+install:
 	@npm install
 	@node_modules/.bin/bower install --allow-root
 	@node_modules/.bin/bower update --allow-root
 	@node_modules/.bin/gulp update
+
+update: install
 
 build:
 	@node_modules/.bin/gulp build

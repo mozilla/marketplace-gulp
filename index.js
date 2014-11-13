@@ -44,6 +44,18 @@ var PORT = process.env.PORT || config.PORT || 8675;
 var LIVERELOAD_PORT = process.env.LIVERELOAD_PORT || PORT + 1000;
 
 
+gulp.task('settings_local_js_init', function() {
+    // Creates a settings_local.js if it doesn't exist.
+    fs.exists(config.JS_DEST_PATH + 'settings_local.js', function(exists) {
+        if (!exists) {
+            gulp.src(config.JS_DEST_PATH + 'settings_local.js.dist')
+                .pipe(rename('settings_local.js'))
+                .pipe(gulp.dest(config.JS_DEST_PATH));
+        }
+    });
+});
+
+
 gulp.task('bower_copy', function() {
     // Copy files from Bower into project.
     Object.keys(config.bowerConfig).forEach(function(source) {
@@ -312,7 +324,7 @@ gulp.task('watch', function() {
         .pipe(watch(paths.styl_lib, function(files) {
             return cssCompilePipe(gulp.src(paths.styl))
                 .pipe(gulpIf(!process.env.NO_LIVERELOAD,
-                             liveReload({LIVERELOAD_PORT, silent: true})));
+                             liveReload(LIVERELOAD_PORT, {silent: true})));
         }));
 
     gulp.watch(paths.index_html, ['index_html_build']);
@@ -323,7 +335,8 @@ gulp.task('serve', ['webserver', 'css_compile', 'templates_build']);
 
 gulp.task('default', ['watch', 'serve']);
 
-gulp.task('update', ['bower_copy', 'index_html_build', 'require_config']);
+gulp.task('update', ['settings_local_js_init', 'bower_copy',
+                     'index_html_build', 'require_config']);
 
 gulp.task('build', ['buildID_write', 'css_build_sync', 'js_build',
                     'templates_build_sync', 'imgurls_write']);
