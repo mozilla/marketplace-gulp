@@ -13,8 +13,6 @@ install:
 	@node_modules/.bin/bower update --allow-root
 	@node_modules/.bin/gulp update
 
-update: install
-
 build:
 	@node_modules/.bin/gulp build
 
@@ -29,3 +27,9 @@ lint:
 
 clean:
 	@node_modules/.bin/gulp clean
+
+init:
+	@echo "'make init' has been removed. Use 'make install' instead."
+
+update:
+	@echo "'make update' has been removed. Use 'make install' instead."
