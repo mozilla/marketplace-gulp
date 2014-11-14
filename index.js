@@ -255,6 +255,9 @@ gulp.task('index_html_build', function() {
     // Copy desired template to index.html.
     // Inject livereload script into served template.
     gulp.src('src/' + template)
+        .pipe(insert.prepend('<!--This is a generated file from ' + template + '.-->\n' +
+                             '<!--Read marketplace-frontend.readthedocs.org ' +
+                             'for more information.-->\n\n'))
         .pipe(replace(/<\/body>/,
               '<script src="http://localhost:' + LIVERELOAD_PORT +
               '/livereload.js"></script>\n</body>'))
