@@ -40,6 +40,7 @@ function transform(file) {
             'server for details.");',
             '}}'
         ].join('\n');
+        console.error(name + ' failed to compile:');
         console.error(e);
     }
     output += '})();\n';
