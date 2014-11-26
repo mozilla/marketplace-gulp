@@ -43,6 +43,25 @@ if (template.indexOf('.html') === -1) {
 var PORT = process.env.PORT || config.PORT || 8675;
 var LIVERELOAD_PORT = process.env.LIVERELOAD_PORT || PORT + 1000;
 
+// Switch API settings.
+if (process.env.API) {
+    var api = config.serverConfig[process.env.API];
+
+    if (!api) {
+        console.log('Invalid argument for API. Possible options: ');
+        console.log(Object.keys(config.serverConfig));
+        process.exit(1);
+    }
+
+    gulp.src(config.JS_DEST_PATH + 'settings_local.js')
+        .pipe(replace(/api_url: .*/g, "api_url: '" + api.api_url + "',"))
+        .pipe(replace(/media_url: .*/g, "media_url: '" + api.media_url + "',"))
+        .pipe(gulp.dest(config.JS_DEST_PATH));
+
+    console.log('settings_local.js has been updated to use the specified API:');
+    console.log('    api_url: ' + api.api_url);
+    console.log('    media_url: ' + api.media_url);
+}
 
 gulp.task('settings_local_js_init', function() {
     // Creates a settings_local.js if it doesn't exist.
