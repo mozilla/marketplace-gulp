@@ -288,6 +288,7 @@ gulp.task('index_html_build', function() {
 gulp.task('webserver', ['index_html_build', 'templates_build'], function() {
     gulp.src(['src'])
         .pipe(webserver({
+            host: '0.0.0.0',
             fallback: 'index.html',
             port: PORT
         }));
