@@ -40,7 +40,7 @@ if (template.indexOf('.html') === -1) {
     template += '.html';
 }
 
-var PORT = process.env.PORT || config.PORT || 8675;
+var PORT = parseInt(process.env.PORT || config.PORT || 8675, 10);
 var LIVERELOAD_PORT = process.env.LIVERELOAD_PORT || PORT + 1000;
 
 // Switch API settings.
