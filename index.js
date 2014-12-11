@@ -14,6 +14,7 @@ var liveReload = require('gulp-livereload');
 var jshint = require('gulp-jshint');
 var mergeStream = require('merge-stream');
 var minifyCSS = require('gulp-minify-css');
+var nunjucks = require('nunjucks');
 var order = require('gulp-order');
 var requireDir = require('require-dir');
 var rename = require('gulp-rename');
@@ -270,16 +271,24 @@ gulp.task('js_build', ['templates_build_sync'], function() {
 });
 
 
+var nunjucksEnv= new nunjucks.Environment(new nunjucks.FileSystemLoader('src'));
 gulp.task('index_html_build', function() {
+    // Run Nunjucks templating on desired template.
+    // Passing in MKT_COMPILED will use compressed assets in dev.html.
     // Copy desired template to index.html.
     // Inject livereload script into served template.
-    gulp.src('src/' + template)
+    var compiled = nunjucksEnv.render(template, {
+        compiled: process.env.MKT_COMPILED
+    });
+    fs.writeFileSync(path.join('src', 'index.html'), compiled);
+
+    gulp.src(path.join('src', 'index.html'))
         .pipe(insert.prepend('<!--This is a generated file from ' + template + '.-->\n' +
                              '<!--Read marketplace-frontend.readthedocs.org ' +
                              'for more information.-->\n\n'))
-        .pipe(replace(/<\/body>/,
+        .pipe(gulpIf(!process.env.MKT_COMPILED, replace(/<\/body>/,
               '<script src="http://localhost:' + LIVERELOAD_PORT +
-              '/livereload.js"></script>\n</body>'))
+              '/livereload.js"></script>\n</body>')))
         .pipe(rename('index.html'))
         .pipe(gulp.dest('src'));
 });
