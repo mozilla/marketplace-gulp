@@ -29,7 +29,7 @@ clean:
 	@node_modules/.bin/gulp clean
 
 init:
-	@echo "'make init' has been removed. Use 'npm install && make install' instead."
+	@echo "'make init' has been removed. Use 'make install' instead."
 
 update:
 	@echo "'make update' has been removed. Use 'make install' instead."
