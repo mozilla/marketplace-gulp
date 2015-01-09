@@ -130,11 +130,10 @@ function cssCompilePipe(stream) {
     // Compile .styl files into .styl.css files.
     // Takes about 2s to compile all CSS files.
     return stream
-        .pipe(stylus())
-        .on('error', function(err) {
+        .pipe(stylus().on('error', function(err) {
             console.log('Stylus compile error: ' + err.name);
             console.log(err.message);
-        })
+        }))
         .pipe(rename(function(path) {
             path.extname = '.styl.css';
         }))
