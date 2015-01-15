@@ -271,7 +271,8 @@ gulp.task('js_build', ['templates_build_sync'], function() {
 });
 
 
-var nunjucksEnv= new nunjucks.Environment(new nunjucks.FileSystemLoader('src'));
+// The second arg to FileSystemLoader is noWatch. It is set to true to disable watching.
+var nunjucksEnv= new nunjucks.Environment(new nunjucks.FileSystemLoader('src', true));
 gulp.task('index_html_build', function() {
     // Run Nunjucks templating on desired template.
     // Passing in MKT_COMPILED will use compressed assets in dev.html.
