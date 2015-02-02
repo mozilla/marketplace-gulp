@@ -310,8 +310,8 @@ gulp.task('lint', function() {
     var js = paths.js;
     js.splice(js.indexOf('src/templates.js'), 1);  // Skip templates.
     js = js.concat([
-        // Skip non-Commonplace lib files.
-        '!' + config.JS_DEST_PATH + 'lib/*.js',
+        // Skip lib files.
+        '!' + config.JS_DEST_PATH + '**/*.js',
         // Skip include.js.
         '!' + config.JS_DEST_PATH + paths.include_js
     ]);
