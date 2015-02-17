@@ -104,7 +104,7 @@ function templatesBuild() {
             '(function() {\n' +
             'var templates = {};\n'))
         .pipe(insert.append(
-            'define("templates", ["nunjucks", "helpers"], function(nunjucks) {\n' +
+            'define("templates", ["core/nunjucks", "core/helpers"], function(nunjucks) {\n' +
             '    nunjucks.env = new nunjucks.Environment([], {autoescape: true});\n' +
             '    nunjucks.env.cache = nunjucks.templates = templates;\n' +
             '    console.log("Templates loaded");\n' +
@@ -260,7 +260,6 @@ function jsBuild(overrideConfig, cb) {
         optimize: 'uglify2',
         out: config.JS_DEST_PATH + paths.include_js,
         shim: config.requireConfig.shim,
-        stubModules: ['views/tests'],
         wrapShim: true,
     }, overrideConfig), cb);
 }
