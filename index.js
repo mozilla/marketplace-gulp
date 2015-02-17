@@ -293,12 +293,16 @@ gulp.task('index_html_build', function() {
         .pipe(gulp.dest('src'));
 });
 
+var rewriteModule = require('http-rewrite-middleware');
+var rewriteMiddleware = rewriteModule.getMiddleware(config.rewriteMiddleware);
+
 
 gulp.task('webserver', ['index_html_build', 'templates_build'], function() {
-    gulp.src(['src'])
+    gulp.src(['src', 'bower_components'])
         .pipe(webserver({
             host: '0.0.0.0',
             fallback: 'index.html',
+            middleware: rewriteMiddleware,
             port: PORT
         }));
 });
