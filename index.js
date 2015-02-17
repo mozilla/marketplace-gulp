@@ -19,6 +19,7 @@ var order = require('gulp-order');
 var requireDir = require('require-dir');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
+var rewriteModule = require('http-rewrite-middleware');
 var rjs = require('requirejs');
 var stylus = require('gulp-stylus');
 var through2 = require('through2');
@@ -104,7 +105,7 @@ function templatesBuild() {
             '(function() {\n' +
             'var templates = {};\n'))
         .pipe(insert.append(
-            'define("templates", ["nunjucks", "helpers"], function(nunjucks) {\n' +
+            'define("templates", ["core/nunjucks", "core/helpers"], function(nunjucks) {\n' +
             '    nunjucks.env = new nunjucks.Environment([], {autoescape: true});\n' +
             '    nunjucks.env.cache = nunjucks.templates = templates;\n' +
             '    console.log("Templates loaded");\n' +
@@ -260,7 +261,6 @@ function jsBuild(overrideConfig, cb) {
         optimize: 'uglify2',
         out: config.JS_DEST_PATH + paths.include_js,
         shim: config.requireConfig.shim,
-        stubModules: ['views/tests'],
         wrapShim: true,
     }, overrideConfig), cb);
 }
@@ -296,10 +296,14 @@ gulp.task('index_html_build', function() {
 
 
 gulp.task('webserver', ['index_html_build', 'templates_build'], function() {
-    gulp.src(['src'])
+    gulp.src(['src', 'bower_components'])
         .pipe(webserver({
             host: '0.0.0.0',
             fallback: 'index.html',
+            middleware: rewriteModule.getMiddleware([
+                {from: '^/media/js/lib/core/(.*)$',
+                 to: '/marketplace-core-modules/core/$1'},
+            ].concat(config.rewriteMiddleware || [])),
             port: PORT
         }));
 });
