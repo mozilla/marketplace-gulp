@@ -19,6 +19,7 @@ var order = require('gulp-order');
 var requireDir = require('require-dir');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
+var rewriteModule = require('http-rewrite-middleware');
 var rjs = require('requirejs');
 var stylus = require('gulp-stylus');
 var through2 = require('through2');
@@ -293,16 +294,13 @@ gulp.task('index_html_build', function() {
         .pipe(gulp.dest('src'));
 });
 
-var rewriteModule = require('http-rewrite-middleware');
-var rewriteMiddleware = rewriteModule.getMiddleware(config.rewriteMiddleware);
-
 
 gulp.task('webserver', ['index_html_build', 'templates_build'], function() {
     gulp.src(['src', 'bower_components'])
         .pipe(webserver({
             host: '0.0.0.0',
             fallback: 'index.html',
-            middleware: rewriteMiddleware,
+            middleware: rewriteModule.getMiddleware(config.rewriteMiddleware),
             port: PORT
         }));
 });
