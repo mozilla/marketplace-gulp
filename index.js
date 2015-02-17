@@ -19,11 +19,13 @@ var order = require('gulp-order');
 var requireDir = require('require-dir');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
+var rewriteModule = require('http-rewrite-middleware');
 var rjs = require('requirejs');
 var stylus = require('gulp-stylus');
 var through2 = require('through2');
 var watch = require('gulp-watch');
 var webserver = require('gulp-webserver');
+var _ = require('underscore');
 
 var config = require(process.env.GULP_CONFIG_PATH || '../../config');
 var nunjucksBuild = require('./plugins/nunjucks-build');
@@ -104,7 +106,7 @@ function templatesBuild() {
             '(function() {\n' +
             'var templates = {};\n'))
         .pipe(insert.append(
-            'define("templates", ["nunjucks", "helpers"], function(nunjucks) {\n' +
+            'define("templates", ["core/nunjucks", "core/helpers"], function(nunjucks) {\n' +
             '    nunjucks.env = new nunjucks.Environment([], {autoescape: true});\n' +
             '    nunjucks.env.cache = nunjucks.templates = templates;\n' +
             '    console.log("Templates loaded");\n' +
@@ -237,6 +239,32 @@ gulp.task('buildID_write', function() {
 });
 
 
+function walk(path) {
+    var files = [];
+    fs.readdirSync(path).forEach(function(filename) {
+        var filePath = path + '/' + filename;
+        var fileStat = fs.statSync(filePath);
+        if (fileStat.isDirectory()) {
+            files = files.concat(walk(filePath));
+        } else {
+            files.push(filePath);
+        }
+    });
+    return files;
+}
+
+function findViewModules(path, prefix) {
+    if (path.slice(-1) !== '/') {
+        path = path + '/';
+    }
+    return walk(path + prefix).filter(function(file) {
+        return file.slice(-3) === '.js';
+    }).map(function(file) {
+        return file.slice(0, -3).replace(path, '');
+    });
+}
+
+
 function jsBuild(overrideConfig, cb) {
     /* r.js AMD optimizer.
      * Will read our RequireJS config to handle shims, paths, and name
@@ -249,18 +277,24 @@ function jsBuild(overrideConfig, cb) {
         overrideConfig.optimize = "none";
     }
 
+    // Find all view modules in the views and core/views folder.
+    var viewFiles = findViewModules(config.JS_DEST_PATH, 'views');
+    var coreSourcePath = config.BOWER_PATH + 'marketplace-core-modules';
+    var coreViewFiles = findViewModules(coreSourcePath, 'core/views');
+
     rjs.optimize(extend(true, {
         baseUrl: config.JS_DEST_PATH,
         findNestedDependencies: true,
         generateSourceMaps: true,
-        include: ['lib/almond', 'main'],
+        include: ['lib/almond', 'main'].concat(viewFiles)
+                                       .concat(coreViewFiles),
         insertRequire: ['main'],
-        paths: config.requireConfig.paths,
+        paths: _.extend(config.requireConfig.paths,
+                        config.requireConfig.buildPaths),
         preserveLicenseComments: false,
         optimize: 'uglify2',
         out: config.JS_DEST_PATH + paths.include_js,
         shim: config.requireConfig.shim,
-        stubModules: ['views/tests'],
         wrapShim: true,
     }, overrideConfig), cb);
 }
@@ -296,10 +330,14 @@ gulp.task('index_html_build', function() {
 
 
 gulp.task('webserver', ['index_html_build', 'templates_build'], function() {
-    gulp.src(['src'])
+    gulp.src(['src', 'bower_components'])
         .pipe(webserver({
             host: '0.0.0.0',
             fallback: 'index.html',
+            middleware: rewriteModule.getMiddleware([
+                {from: '^/media/js/lib/core/(.*)$',
+                 to: '/marketplace-core-modules/core/$1'},
+            ].concat(config.rewriteMiddleware || [])),
             port: PORT
         }));
 });
@@ -311,7 +349,7 @@ gulp.task('lint', function() {
     js.splice(js.indexOf('src/templates.js'), 1);  // Skip templates.
     js = js.concat([
         // Skip lib files.
-        '!' + config.JS_DEST_PATH + '**/*.js',
+        '!' + config.LIB_DEST_PATH + '**/*.js',
         // Skip include.js.
         '!' + config.JS_DEST_PATH + paths.include_js
     ]);
