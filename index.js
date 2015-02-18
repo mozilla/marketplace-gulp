@@ -300,7 +300,10 @@ gulp.task('webserver', ['index_html_build', 'templates_build'], function() {
         .pipe(webserver({
             host: '0.0.0.0',
             fallback: 'index.html',
-            middleware: rewriteModule.getMiddleware(config.rewriteMiddleware),
+            middleware: rewriteModule.getMiddleware([
+                {from: '^/media/js/lib/core/(.*)$',
+                 to: '/marketplace-core-modules/core/$1'},
+            ].concat(config.rewriteMiddleware || [])),
             port: PORT
         }));
 });
