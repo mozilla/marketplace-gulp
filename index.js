@@ -25,6 +25,7 @@ var stylus = require('gulp-stylus');
 var through2 = require('through2');
 var watch = require('gulp-watch');
 var webserver = require('gulp-webserver');
+var _ = require('underscore');
 
 var config = require(process.env.GULP_CONFIG_PATH || '../../config');
 var nunjucksBuild = require('./plugins/nunjucks-build');

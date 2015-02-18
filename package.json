@@ -1,7 +1,7 @@
 {
   "name": "marketplace-gulp",
   "description": "gulpfiles for Firefox Marketplace frontend projects",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0-beta.3",
   "main": "index",
   "repository": {
     "url": "git://github.com/mozilla/marketplace-gulp.git",
@@ -41,6 +41,7 @@
     "requirejs": "2.1.15",
     "run-sequence": "1.0.1",
     "stylus": "0.50.x",
-    "through2": "0.6.2"
+    "through2": "0.6.2",
+    "underscore": "^1.7.0"
   }
 }
