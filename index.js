@@ -239,6 +239,29 @@ gulp.task('buildID_write', function() {
 });
 
 
+function walk(path) {
+    var files = [];
+    fs.readdirSync(path).forEach(function(filename) {
+        var filePath = path + '/' + filename;
+        var fileStat = fs.statSync(filePath);
+        if (fileStat.isDirectory()) {
+            files = files.concat(walk(filePath));
+        } else {
+            files.push(filePath);
+        }
+    });
+    return files;
+}
+
+function findViewModules(path, prefix) {
+    return walk(path + '/' + prefix).filter(function(file) {
+        return file.slice(-3) === '.js';
+    }).map(function(file) {
+        return file.slice(0, -3).replace(path + '/', '');
+    });
+}
+
+
 function jsBuild(overrideConfig, cb) {
     /* r.js AMD optimizer.
      * Will read our RequireJS config to handle shims, paths, and name
@@ -251,11 +274,17 @@ function jsBuild(overrideConfig, cb) {
         overrideConfig.optimize = "none";
     }
 
+    // Find all view modules in the views and core/views folder.
+    var viewFiles = findViewModules(config.JS_DEST_PATH, 'views');
+    var coreSourcePath = config.BOWER_PATH + 'marketplace-core-modules';
+    var coreViewFiles = findViewModules(coreSourcePath, 'core/views');
+
     rjs.optimize(extend(true, {
         baseUrl: config.JS_DEST_PATH,
         findNestedDependencies: true,
         generateSourceMaps: true,
-        include: ['lib/almond', 'main'],
+        include: ['lib/almond', 'main'].concat(viewFiles)
+                                       .concat(coreViewFiles),
         insertRequire: ['main'],
         paths: _.extend(config.requireConfig.paths,
                         config.requireConfig.buildPaths),
