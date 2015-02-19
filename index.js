@@ -279,6 +279,10 @@ function jsBuild(overrideConfig, cb) {
     var coreSourcePath = config.BOWER_PATH + 'marketplace-core-modules';
     var coreViewFiles = findViewModules(coreSourcePath, 'core/views');
 
+    console.log('config.JS_DEST_PATH: ' + config.JS_DEST_PATH);
+    console.log('viewFiles: ' + viewFiles);
+    console.log('coreViewFiles: ' + coreViewFiles);
+
     rjs.optimize(extend(true, {
         baseUrl: config.JS_DEST_PATH,
         findNestedDependencies: true,
