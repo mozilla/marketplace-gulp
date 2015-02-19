@@ -254,10 +254,13 @@ function walk(path) {
 }
 
 function findViewModules(path, prefix) {
-    return walk(path + '/' + prefix).filter(function(file) {
+    if (path.slice(-1) !== '/') {
+        path = path + '/';
+    }
+    return walk(path + prefix).filter(function(file) {
         return file.slice(-3) === '.js';
     }).map(function(file) {
-        return file.slice(0, -3).replace(path + '/', '');
+        return file.slice(0, -3).replace(path, '');
     });
 }
 
