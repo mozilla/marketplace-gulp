@@ -40,7 +40,7 @@
     "require-dir": "0.1.0",
     "requirejs": "2.1.15",
     "run-sequence": "1.0.1",
-    "stylus": "0.50.x",
+    "stylus": "0.32.x",
     "through2": "0.6.2"
   }
 }
