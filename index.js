@@ -288,7 +288,7 @@ function jsBuild(overrideConfig, cb) {
         generateSourceMaps: true,
         include: ['lib/almond', 'main'].concat(viewFiles)
                                        .concat(coreViewFiles),
-        insertRequire: ['main'],
+        insertRequire: ['core/init'],
         paths: _.extend(config.requireConfig.paths,
                         config.requireConfig.buildPaths),
         preserveLicenseComments: false,
