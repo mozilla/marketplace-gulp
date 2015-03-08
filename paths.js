@@ -6,7 +6,7 @@ var paths = {
     styl_compiled: config.CSS_DEST_PATH + '**/*.styl.css',
     styl_lib: [config.CSS_DEST_PATH + 'lib.styl',
                config.CSS_DEST_PATH + 'lib/**/*.styl'],
-    html: 'src/templates/**/*.html',
+    html: ['src/templates/**/*.html', '!src/templates/**/tests.html'],
     include_css: 'include.css',
     include_js: 'include.js',
     index_html: ['src/*.html', '!src/index.html'],
