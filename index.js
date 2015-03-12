@@ -361,7 +361,9 @@ gulp.task('lint', function() {
         // Skip lib files.
         '!' + config.LIB_DEST_PATH + '**/*.js',
         // Skip include.js.
-        '!' + config.JS_DEST_PATH + paths.include_js
+        '!' + config.JS_DEST_PATH + paths.include_js,
+        // Skip l10n.js.
+        '!' + config.JS_DEST_PATH + 'l10n.js'
     ]);
     gulp.src(js)
         .pipe(jshint())
