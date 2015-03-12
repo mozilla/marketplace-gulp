@@ -23,6 +23,7 @@ var rewriteModule = require('http-rewrite-middleware');
 var rjs = require('requirejs');
 var stylus = require('gulp-stylus');
 var through2 = require('through2');
+var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
 var webserver = require('gulp-webserver');
 var _ = require('underscore');
@@ -67,6 +68,7 @@ if (process.env.API) {
     console.log('    media_url: ' + api.media_url);
 }
 
+
 gulp.task('settings_local_js_init', function() {
     // Creates a settings_local.js if it doesn't exist.
     fs.exists(config.JS_DEST_PATH + 'settings_local.js', function(exists) {
@@ -93,6 +95,14 @@ gulp.task('require_config', function() {
     gulp.src(paths.require)
         .pipe(insert.append(config.inlineRequireConfig))
         .pipe(gulp.dest(config.LIB_DEST_PATH));
+});
+
+
+gulp.task('l10n_init_js_build', function() {
+    gulp.src(config.BOWER_PATH + 'marketplace-core-modules/core/l10n_init.js')
+        .pipe(rename('l10n.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest(config.JS_DEST_PATH));
 });
 
 
@@ -432,10 +442,12 @@ gulp.task('serve', ['webserver', 'css_compile', 'templates_build']);
 gulp.task('default', ['watch', 'serve']);
 
 gulp.task('update', ['settings_local_js_init', 'bower_copy',
-                     'index_html_build', 'require_config']);
+                     'index_html_build', 'require_config',
+                     'l10n_init_js_build']);
 
 gulp.task('build', ['buildID_write', 'css_build_sync', 'js_build',
-                    'templates_build_sync', 'imgurls_write']);
+                    'templates_build_sync', 'imgurls_write',
+                    'l10n_init_js_build']);
 
 
 module.exports = {
