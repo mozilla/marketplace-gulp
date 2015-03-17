@@ -61,11 +61,13 @@ if (process.env.API) {
     gulp.src(config.JS_DEST_PATH + 'settings_local.js')
         .pipe(replace(/api_url: .*/g, "api_url: '" + api.api_url + "',"))
         .pipe(replace(/media_url: .*/g, "media_url: '" + api.media_url + "',"))
+        .pipe(replace(/manifest_url: .*/g, "manifest_url: '" + api.manifest_url + "',"))
         .pipe(gulp.dest(config.JS_DEST_PATH));
 
     console.log('settings_local.js has been updated to use the specified API:');
-    console.log('    api_url: ' + api.api_url);
-    console.log('    media_url: ' + api.media_url);
+    console.log('     api_url: ' + api.api_url);
+    console.log('   media_url: ' + api.media_url);
+    console.log('manifest_url: ' + api.manifest_url);
 }
 
 
