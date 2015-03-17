@@ -98,14 +98,6 @@ gulp.task('require_config', function() {
 });
 
 
-gulp.task('l10n_init_js_build', function() {
-    gulp.src(config.BOWER_PATH + 'marketplace-core-modules/core/l10n_init.js')
-        .pipe(rename('l10n.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(config.JS_DEST_PATH));
-});
-
-
 function templatesBuild() {
     // Build Nunjucks templates into a templates.js file.
     // Takes about 200ms to compile all templates.
@@ -289,16 +281,18 @@ function jsBuild(overrideConfig, cb) {
 
     // Find all view modules in the views and core/views folder.
     var viewFiles = findViewModules(config.JS_DEST_PATH, 'views');
-    var coreSourcePath = config.BOWER_PATH + 'marketplace-core-modules';
+    var coreSourcePath = config.BOWER_PATH + 'marketplace-core-modules/';
     var coreViewFiles = findViewModules(coreSourcePath, 'core/views');
 
     rjs.optimize(extend(true, {
         baseUrl: config.JS_DEST_PATH,
         findNestedDependencies: true,
         generateSourceMaps: true,
-        include: ['lib/almond', 'main'].concat(viewFiles)
-                                       .concat(coreViewFiles),
-        insertRequire: ['main'],
+        include: ['lib/almond', 'main']
+                 .concat(viewFiles)
+                 .concat(coreViewFiles)
+                 .concat(['core/l10n_init']),
+        insertRequire: ['core/l10n_init'],
         paths: _.extend(config.requireConfig.paths,
                         config.requireConfig.buildPaths),
         preserveLicenseComments: false,
@@ -444,12 +438,10 @@ gulp.task('serve', ['webserver', 'css_compile', 'templates_build']);
 gulp.task('default', ['watch', 'serve']);
 
 gulp.task('update', ['settings_local_js_init', 'bower_copy',
-                     'index_html_build', 'require_config',
-                     'l10n_init_js_build']);
+                     'index_html_build', 'require_config']);
 
 gulp.task('build', ['buildID_write', 'css_build_sync', 'js_build',
-                    'templates_build_sync', 'imgurls_write',
-                    'l10n_init_js_build']);
+                    'templates_build_sync', 'imgurls_write']);
 
 
 module.exports = {
