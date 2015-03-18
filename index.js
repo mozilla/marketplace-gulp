@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 
+var autoprefixer = require('gulp-autoprefixer');
 var concat = require('gulp-concat');
 var del = require('del');
 var eventStream = require('event-stream');
@@ -47,6 +48,13 @@ if (template.indexOf('.html') === -1) {
 
 var PORT = parseInt(process.env.PORT || config.PORT || 8675, 10);
 var LIVERELOAD_PORT = process.env.LIVERELOAD_PORT || PORT + 1000;
+
+var BROWSERSLIST_CSS = [
+    '> 1%',
+    'last 2 versions',
+    'Firefox >= 18',
+    'Opera 12.1'
+];
 
 // Switch API settings.
 if (process.env.API) {
@@ -148,6 +156,9 @@ function cssCompilePipe(stream) {
             console.log('Stylus compile error: ' + err.name);
             console.log(err.message);
         }))
+        .pipe(autoprefixer({
+            browsers: BROWSERSLIST_CSS
+        }))
         .pipe(rename(function(path) {
             path.extname = '.styl.css';
         }))
@@ -223,6 +234,9 @@ gulp.task('css_build_sync', ['css_bundles', 'css_compile_sync'], function(done) 
 
     return gulp.src(css_src.concat(excludes))
         .pipe(stylus({compress: true}))
+        .pipe(autoprefixer({
+            browsers: BROWSERSLIST_CSS
+        }))
         .pipe(imgurlsCachebust())
         .pipe(gulpIf(!process.env.NO_MINIFY, minifyCSS()))
         .pipe(order(css_files,
