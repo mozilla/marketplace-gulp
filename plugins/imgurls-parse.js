@@ -5,8 +5,6 @@
 var path = require('path');
 var through = require('through2');
 
-var config = require(process.env.GULP_CONFIG_PATH || '../../../config');
-
 var url_pattern = /url\(([^)]+\?\d+)\)/g;  // Cachebusted imgurl.
 var img_urls = [];  // Keep track of duplicates.
 
@@ -23,7 +21,7 @@ function transform(file) {
         // Ensure it is an absolute URL (no relative URLs).
         var has_origin = url.search(/(https?):|\/\//) === 0 || url[0] === '/';
         if (!has_origin) {
-            var absolute_path = path.join(config.CSS_DEST_PATH, url);
+            var absolute_path = path.join(MKT_CONFIG.CSS_DEST_PATH, url);
             url = '/' + path.relative('src', absolute_path);
         }
 
