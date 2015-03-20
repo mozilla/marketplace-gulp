@@ -14,6 +14,7 @@ var fs = require('fs');
 
 var extend = require('node.extend');
 var jshint = require('gulp-jshint');
+var rename = require('gulp-rename');
 var rjs = require('requirejs');
 
 require('./templates');
