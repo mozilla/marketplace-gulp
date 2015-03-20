@@ -69,7 +69,7 @@ function findViewModules(path, prefix) {
 function jsBuild(overrideConfig, cb) {
     // RTD: https://github.com/jrburke/r.js/blob/master/build/example.build.js
     overrideConfig = overrideConfig || {};
-    if (process.env.NO_MINIFY) {
+    if (process.env.MKT_NO_MINIFY) {
         overrideConfig.optimize = "none";
     }
 

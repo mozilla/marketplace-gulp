@@ -68,7 +68,7 @@ gulp.task('css_build_sync', ['css_bundles',
     return gulp.src(css_src.concat(excludes))
         .pipe(stylus({compress: true}))
         .pipe(imgurlsCachebust())
-        .pipe(gulpIf(!process.env.NO_MINIFY, minifyCSS()))
+        .pipe(gulpIf(!process.env.MKT_NO_MINIFY, minifyCSS()))
         .pipe(order(css_files,
                     {base: MKT_CONFIG.CSS_DEST_PATH}))
         .pipe(concat(MKT_PATHS.include_css))
