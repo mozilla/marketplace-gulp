@@ -14,6 +14,7 @@
 var fs = require('fs');
 var path = require('path');
 
+var autoprefixer = require('gulp-autoprefixer');
 var concat = require('gulp-concat');
 var gulpIf = require('gulp-if');
 var liveReload = require('gulp-livereload');
@@ -25,6 +26,14 @@ var stylus = require('gulp-stylus');
 var through2 = require('through2');
 
 var imgurlsCachebust = require('../plugins/imgurls-cachebust');
+
+
+var BROWSERSLIST_CSS = [
+    '> 1%',
+    'last 2 versions',
+    'Firefox >= 18',
+    'Opera 12.1'
+];
 
 
 // Keeps track of already compiled CSS for liveReload.
@@ -67,6 +76,9 @@ gulp.task('css_build_sync', ['css_bundles',
 
     return gulp.src(css_src.concat(excludes))
         .pipe(stylus({compress: true}))
+        .pipe(autoprefixer({
+            browsers: BROWSERSLIST_CSS
+        }))
         .pipe(imgurlsCachebust())
         .pipe(gulpIf(!process.env.MKT_NO_MINIFY, minifyCSS()))
         .pipe(order(css_files,
@@ -117,6 +129,9 @@ function cssCompilePipe(stream) {
         .pipe(stylus().on('error', function(err) {
             console.log('Stylus compile error: ' + err.name);
             console.log(err.message);
+        }))
+        .pipe(autoprefixer({
+            browsers: BROWSERSLIST_CSS
         }))
         .pipe(rename(function(path) {
             path.extname = '.styl.css';
