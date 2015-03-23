@@ -1,6 +1,12 @@
 # Common Makefile directives for Marketplace frontend projects that are usually
 # aliases to Gulp tasks.
 
+CASPERJS_BIN ?= 'casperjs'
+CASPERJS_SHIM ?= 'node_modules/marketplace-gulp/tests/casper-shim.js'
+SLIMERJSLAUNCHER ?= '/Applications/Firefox.app/Contents/MacOS/firefox'
+SLIMERJS_VERSION ?= '0.10.0pre'
+UITEST_FILE ?= 'tests/ui/'
+
 gulp:
 	@node_modules/.bin/gulp
 
@@ -33,3 +39,37 @@ init:
 
 update:
 	@echo "'make update' has been removed. Use 'make install' instead."
+
+test:
+	make lint && make unittest && make uitest
+
+uitest:
+	make uitest-phantom && make uitest-slimer
+
+uitest-phantom:
+	PATH=node_modules/.bin:${PATH} LC_ALL=en-US $(CASPERJS_BIN) test ${UITEST_FILE} --includes=${CASPERJS_SHIM} --engine=phantomjs
+
+uitest-slimer:
+	SLIMERJSLAUNCHER=${SLIMERJSLAUNCHER} PATH=slimerjs:node_modules/.bin:${PATH} LC_ALL=en-US $(CASPERJS_BIN) test ${UITEST_FILE} --includes=${CASPERJS_SHIM} --engine=slimerjs
+
+unittest: templates
+	@node_modules/karma/bin/karma start --single-run
+
+unittest-watch: templates
+	@node_modules/karma/bin/karma start
+
+test-langpacks:
+	commonplace langpacks
+
+test-package:
+	make package
+	test -f package/builds/_prod/media/js/include.js
+
+upload-captures:
+	@node_modules/.bin/gulp upload_captures
+	exit 0
+
+install-slimer:
+	curl -O 'http://download.slimerjs.org/nightlies/latest-slimerjs-master/slimerjs-${SLIMERJS_VERSION}.zip'
+	unzip slimerjs-${SLIMERJS_VERSION}.zip
+	mv slimerjs-${SLIMERJS_VERSION} slimerjs
