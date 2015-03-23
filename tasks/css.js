@@ -127,6 +127,10 @@ function cssCompilePipe(stream) {
     // Compile .styl files into .styl.css files. Takes about 2s for all files.
     return stream
         .pipe(stylus().on('error', function(err) {
+            if (err && err.message == 'no writecb in Transform class') {
+                // Ignore autoprefixer-caused message.
+                return;
+            }
             console.log('Stylus compile error: ' + err.name);
             console.log(err.message);
         }))
