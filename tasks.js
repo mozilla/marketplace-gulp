@@ -81,7 +81,8 @@ gulp.task('default', ['watch', 'serve']);
 
 
 gulp.task('update', ['settings_local_js_init', 'bower_copy',
-                     'index_html_build', 'require_config']);
+                     'index_html_build', 'require_config',
+                     'karma_conf_generate', 'karma_test_main_generate']);
 
 
 module.exports = {
