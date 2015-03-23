@@ -36,10 +36,12 @@
     "merge-stream": "0.1.6",
     "node.extend": "1.1.2",
     "nunjucks": "1.0.x",
+    "request": "^2.53.0",
     "require-dir": "0.1.0",
     "requirejs": "2.1.15",
     "run-sequence": "1.0.1",
     "stylus": "0.50.x",
+    "through": "^2.3.6",
     "through2": "0.6.2"
   }
 }
