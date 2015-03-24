@@ -85,6 +85,7 @@ gulp.task('update', ['settings_local_js_init', 'bower_copy',
 
 
 module.exports = {
+    gulp: gulp,
     jsBuild: jsTasks.jsBuild,
     paths: MKT_PATHS
 };
