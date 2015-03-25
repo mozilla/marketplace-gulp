@@ -36,6 +36,6 @@ setGlobal('localRequire', localRequire);
 var _ = globalRequire('node_modules/underscore/underscore', '_');
 
 var helpers = _.extend(
-    localRequire('node_modules/marketplace-gulp/casper-helpers'),
+    localRequire('node_modules/marketplace-gulp/tests/casper-helpers'),
     localRequire('tests/lib/helpers'));
 setGlobal('helpers', helpers);

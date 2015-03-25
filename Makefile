@@ -2,7 +2,7 @@
 # aliases to Gulp tasks.
 
 CASPERJS_BIN ?= 'casperjs'
-CASPERJS_SHIM ?= 'node_modules/marketplace-gulp/casper-shim.js'
+CASPERJS_SHIM ?= 'node_modules/marketplace-gulp/tests/casper-shim.js'
 SLIMERJSLAUNCHER ?= '/Applications/Firefox.app/Contents/MacOS/firefox'
 SLIMERJS_VERSION ?= '0.10.0pre'
 UITEST_FILE ?= 'tests/ui/'
