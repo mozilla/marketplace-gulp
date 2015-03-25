@@ -300,6 +300,16 @@ function tearDown() {
 }
 
 
+function load(moduleName) {
+    return localRequire('tests/lib/' + moduleName);
+}
+
+
+function npm(moduleName) {
+    return localRequire('node_modules/' + moduleName);
+}
+
+
 casper.test.tearDown(tearDown);
 
 // This module gets extended by local.js.
@@ -312,7 +322,9 @@ module.exports = {
     checkValidity: checkValidity,
     done: done,
     fake_login: fake_login,
+    load: load,
     makeUrl: makeUrl,
+    npm: npm,
     parseQueryString: parseQueryString,
     selectOption: selectOption,
     startCasper: startCasper,
