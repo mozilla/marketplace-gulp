@@ -67,6 +67,7 @@ casper.on('page.error', function(message) {
 
 var viewports = {
     desktop: setUpDesktop,
+    mobile: setUpMobile,
     tablet: setUpTablet,
 };
 
@@ -283,7 +284,15 @@ function setUpTablet() {
 }
 
 
-function setViewport() {
+function setUpMobile() {
+    viewportSize = [320, 480];
+}
+
+
+function setViewport(size) {
+    if (size) {
+        viewports[size]();
+    }
     casper.viewport(viewportSize[0], viewportSize[1]);
 }
 
@@ -327,6 +336,7 @@ module.exports = {
     npm: npm,
     parseQueryString: parseQueryString,
     selectOption: selectOption,
+    setViewport: setViewport,
     startCasper: startCasper,
     tearDown: tearDown,
     waitForLoggedIn: waitForLoggedIn,
