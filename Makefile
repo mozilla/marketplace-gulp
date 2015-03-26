@@ -47,10 +47,10 @@ uitest:
 	make uitest-phantom && make uitest-slimer
 
 uitest-phantom:
-	PATH=node_modules/.bin:${PATH} LC_ALL=en-US $(CASPERJS_BIN) test ${UITEST_FILE} --includes=${CASPERJS_SHIM} --engine=phantomjs
+	TEST_URL=${TEST_URL} PATH=node_modules/.bin:${PATH} LC_ALL=en-US $(CASPERJS_BIN) test ${UITEST_FILE} --includes=${CASPERJS_SHIM} --engine=phantomjs
 
 uitest-slimer:
-	SLIMERJSLAUNCHER=${SLIMERJSLAUNCHER} PATH=slimerjs:node_modules/.bin:${PATH} LC_ALL=en-US $(CASPERJS_BIN) test ${UITEST_FILE} --includes=${CASPERJS_SHIM} --engine=slimerjs
+	TEST_URL=${TEST_URL} SLIMERJSLAUNCHER=${SLIMERJSLAUNCHER} PATH=slimerjs:node_modules/.bin:${PATH} LC_ALL=en-US $(CASPERJS_BIN) test ${UITEST_FILE} --includes=${CASPERJS_SHIM} --engine=slimerjs
 
 unittest: templates
 	@node_modules/karma/bin/karma start --single-run

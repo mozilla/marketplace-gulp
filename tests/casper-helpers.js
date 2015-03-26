@@ -5,7 +5,7 @@ if (!require.config) {
 }
 var utils = require('utils');
 
-var baseTestUrl = 'http://localhost:8675';
+var baseTestUrl = system.env.TEST_URL;
 var defaultViewportSize = [320, 480];
 var viewportSize = defaultViewportSize;
 var pageAlreadyLoaded = false;
