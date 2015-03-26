@@ -164,5 +164,6 @@ function smartLiveReload(cssStream, liveReloadServer) {
 
 module.exports = {
     cssCompile: cssCompile,
+    cssCompilePipe: cssCompilePipe,
     smartLiveReload: smartLiveReload
 };

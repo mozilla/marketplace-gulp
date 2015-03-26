@@ -12,7 +12,7 @@ var rewriteModule = require('http-rewrite-middleware');
 var watch = require('gulp-watch');
 var webserver = require('gulp-webserver');
 
-var cssCompile = require('./css').cssCompile;
+var cssCompilePipe = require('./css').cssCompilePipe;
 var smartLiveReload = require('./css').smartLiveReload;
 
 
@@ -28,7 +28,7 @@ gulp.task('watch', function() {
     // CSS compilation uses gulp-watch to only compile modified files.
     gulp.src(MKT_PATHS.styl)
         .pipe(watch(MKT_PATHS.styl, function(files) {
-            return smartLiveReload(cssCompile(files), liveReloadServer);
+            return smartLiveReload(cssCompilePipe(files), liveReloadServer);
         }));
 
     // Recompile all Stylus files if a lib file was modified.
@@ -41,7 +41,7 @@ gulp.task('watch', function() {
             if (showLibMsg) {
                 console.log('Lib file changed. Recompiling all CSS.');
             }
-            return cssCompile(gulp.src(MKT_PATHS.styl));
+            return cssCompilePipe(gulp.src(MKT_PATHS.styl));
         }));
 
     gulp.watch(MKT_PATHS.index_html, ['index_html_build']);
