@@ -6,8 +6,6 @@ CASPERJS_SHIM ?= 'node_modules/marketplace-gulp/tests/casper-shim.js'
 SLIMERJSLAUNCHER ?= '/Applications/Firefox.app/Contents/MacOS/firefox'
 SLIMERJS_VERSION ?= '0.10.0pre'
 UITEST_FILE ?= 'tests/ui/'
-PORT ?= $(shell grep 'PORT: \d\d*' config.js | grep -o '\d\d*')
-TEST_URL ?= 'http://localhost:${PORT}'
 
 gulp:
 	@node_modules/.bin/gulp
