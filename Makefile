@@ -61,10 +61,6 @@ unittest-watch: templates
 test-langpacks:
 	commonplace langpacks
 
-test-package:
-	make package
-	test -f package/builds/_prod/media/js/include.js
-
 upload-captures:
 	@node_modules/.bin/gulp upload_captures
 	exit 0
