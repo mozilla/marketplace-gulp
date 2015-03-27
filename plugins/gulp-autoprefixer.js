@@ -1,37 +1,21 @@
 /*
-    Adapted from gulp-autoprefixer since its sourcemap support was breaking
-    things.
+    Adapted from gulp-autoprefixer.
 */
 'use strict';
 var autoprefixer = require('autoprefixer-core');
-var gutil = require('gulp-util');
 var through = require('through2');
+
 
 module.exports = function (opts) {
 	opts = opts || {};
 
-	return through.obj(function (file, enc, cb) {
-		if (file.isNull()) {
-			cb(null, file);
-			return;
-		}
-		if (file.isStream()) {
-			cb(new gutil.PluginError('gulp-autoprefixer',
-                                     'Streaming not supported'));
-			return;
-		}
+    function transform(file) {
+        return autoprefixer(opts).process(file.contents.toString()).css;
+    }
 
-		var res;
-
-		try {
-			res = autoprefixer(opts).process(file.contents.toString());
-			file.contents = new Buffer(res.css);
-			this.push(file);
-		} catch (err) {
-			this.emit('error', new gutil.PluginError('gulp-autoprefixer', err,
-                      {fileName: file.path}));
-		}
-
-		cb();
+	return through.obj(function(file, enc, cb) {
+        file.contents = new Buffer(transform(file));
+        this.push(file);
+		return cb();
 	});
 };
