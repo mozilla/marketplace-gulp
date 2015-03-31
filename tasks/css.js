@@ -75,7 +75,7 @@ gulp.task('css_build_sync', ['css_bundles',
     }
 
     return gulp.src(css_src.concat(excludes))
-        .pipe(stylus({compress: true}))
+        .pipe(stylus(MKT_CONFIG.stylusConfig))
         .pipe(autoprefixer({
             browsers: BROWSERSLIST_CSS
         }))

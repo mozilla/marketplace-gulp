@@ -1,7 +1,7 @@
 {
   "name": "marketplace-gulp",
   "description": "gulpfiles for Firefox Marketplace frontend projects",
-  "version": "4.4.0",
+  "version": "4.5.0",
   "main": "index",
   "repository": {
     "url": "git://github.com/mozilla/marketplace-gulp.git",
