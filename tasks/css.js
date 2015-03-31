@@ -27,7 +27,6 @@ var through2 = require('through2');
 
 var imgurlsCachebust = require('../plugins/imgurls-cachebust');
 
-
 var BROWSERSLIST_CSS = [
     '> 1%',
     'last 2 versions',
@@ -73,9 +72,8 @@ gulp.task('css_build_sync', ['css_bundles',
     if (!css_src.length) {
         return done();
     }
-
     return gulp.src(css_src.concat(excludes))
-        .pipe(stylus({compress: true}))
+        .pipe(stylus(MKT_CONFIG.stylusConfig))
         .pipe(autoprefixer({
             browsers: BROWSERSLIST_CSS
         }))
@@ -129,7 +127,7 @@ function cssCompilePipe(stream) {
         .pipe(rename(function(path) {
             console.log('Compiling ' + path.dirname + '/' + path.basename + '.styl');
         }))
-        .pipe(stylus().on('error', function(err) {
+        .pipe(stylus(MKT_CONFIG.stylusConfig).on('error', function(err) {
             console.log('Stylus compile error: ' + err.name);
             console.log(err.message);
         }))
