@@ -14,7 +14,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var autoprefixer = require('../plugins/gulp-autoprefixer');
+var autoprefixer = require('gulp-autoprefixer');
 var concat = require('gulp-concat');
 var gulpIf = require('gulp-if');
 var liveReload = require('gulp-livereload');
