@@ -7,6 +7,7 @@
                  in the config or as an environment variable. It also handles
                  rewriting paths to bower_components. It serves src/index.html.
 */
+var babelConnect = require('babel-connect');
 var liveReload = require('gulp-livereload');
 var rewriteModule = require('http-rewrite-middleware');
 var watch = require('gulp-watch');
@@ -47,16 +48,34 @@ gulp.task('watch', function() {
     gulp.watch(MKT_PATHS.index_html, ['index_html_build']);
 });
 
+var babelMiddleware = babelConnect({
+    options: {
+        modules: 'ignore',
+    },
+    src: 'src',
+    dest: 'cache',
+});
+
 
 gulp.task('webserver', ['index_html_build', 'templates_build'], function() {
     gulp.src(['src', 'bower_components'])
         .pipe(webserver({
             host: '0.0.0.0',
             fallback: 'index.html',
-            middleware: rewriteModule.getMiddleware([
-                {from: '^/media/js/lib/core/(.*)$',
-                 to: '/marketplace-core-modules/core/$1'},
-            ].concat(MKT_CONFIG.rewriteMiddleware || [])),
+            middleware: [
+                rewriteModule.getMiddleware([
+                    {from: '^/media/js/lib/core/(.*)$',
+                    to: '/marketplace-core-modules/core/$1'},
+                ].concat(MKT_CONFIG.rewriteMiddleware || [])),
+                function(req, res, next) {
+                    if (req.url.indexOf('/media/js/') === 0 &&
+                        req.url.indexOf('/media/js/lib/') !== 0) {
+                        return babelMiddleware(req, res, next);
+                    } else {
+                        return next();
+                    }
+                },
+            ],
             port: MKT_PORT
         }));
 });
