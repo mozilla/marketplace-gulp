@@ -52,10 +52,10 @@ uitest-phantom:
 uitest-slimer:
 	TEST_URL=${TEST_URL} SLIMERJSLAUNCHER=${SLIMERJSLAUNCHER} PATH=slimerjs:node_modules/.bin:${PATH} LC_ALL=en-US $(CASPERJS_BIN) test ${UITEST_FILE} --includes=${CASPERJS_SHIM} --engine=slimerjs
 
-unittest: templates
+unittest:
 	@node_modules/karma/bin/karma start --single-run
 
-unittest-watch: templates
+unittest-watch:
 	@node_modules/karma/bin/karma start
 
 test-langpacks:
