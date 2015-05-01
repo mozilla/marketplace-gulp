@@ -124,9 +124,6 @@ function cssCompile() {
 function cssCompilePipe(stream) {
     // Compile .styl files into .styl.css files. Takes about 2s for all files.
     return stream
-        .pipe(rename(function(path) {
-            console.log('Compiling ' + path.dirname + '/' + path.basename + '.styl');
-        }))
         .pipe(stylus(MKT_CONFIG.stylusConfig).on('error', function(err) {
             console.log('Stylus compile error: ' + err.name);
             console.log(err.message);
