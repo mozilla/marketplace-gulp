@@ -66,6 +66,6 @@ upload-captures:
 	exit 0
 
 install-slimer:
-	curl -O 'http://download.slimerjs.org/nightlies/latest-slimerjs-master/slimerjs-${SLIMERJS_VERSION}.zip'
-	unzip slimerjs-${SLIMERJS_VERSION}.zip
+	curl -O 'http://download.slimerjs.org/nightlies/latest-slimerjs-master/slimerjs-${SLIMERJS_VERSION}-linux-x86_64.tar.bz2'
+	tar jxf slimerjs-${SLIMERJS_VERSION}-linux-x86_64.tar.bz2
 	mv slimerjs-${SLIMERJS_VERSION} slimerjs
