@@ -38,7 +38,8 @@ gulp.task('lint', function() {
     ]);
     gulp.src(js)
         .pipe(jshint())
-        .pipe(jshint.reporter('jshint-stylish'));
+        .pipe(jshint.reporter('jshint-stylish'))
+        .pipe(jshint.reporter('fail'));
 });
 
 
