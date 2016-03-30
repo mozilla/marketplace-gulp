@@ -58,8 +58,8 @@ unittest: templates
 unittest-watch: templates
 	@node_modules/karma/bin/karma start
 
-test-langpacks:
-	commonplace langpacks
+test-i18njs:
+	commonplace i18njs
 
 upload-captures:
 	@node_modules/.bin/gulp upload_captures
